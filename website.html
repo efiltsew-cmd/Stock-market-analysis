@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미국 증시 현황</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: #151a23;
+            --card-border: #232b38;
+            --text-main: #f1f5f9;
+            --text-sub: #8c9eb5;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-neon: #33d1b6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Noto Sans KR', sans-serif;
+            padding: 24px 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 860px;
+        }
+
+        header {
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        .index-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .index-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .index-card:hover {
+            border-color: rgba(51, 209, 182, 0.4);
+        }
+
+        .card-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .index-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .index-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .index-code {
+            font-size: 11px;
+            color: var(--accent-neon);
+            background: rgba(51, 209, 182, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(51, 209, 182, 0.2);
+            font-weight: 500;
+        }
+
+        .index-desc {
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--accent-neon);
+            font-weight: 500;
+        }
+
+        .arrow-icon {
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid var(--accent-neon);
+            border-bottom: 2px solid var(--accent-neon);
+            transform: rotate(45deg);
+            transition: transform 0.3s ease;
+        }
+
+        .index-card.active .arrow-icon {
+            transform: rotate(-135deg);
+        }
+
+        .chart-container {
+            display: none;
+            height: 480px;
+            border-top: 1px solid var(--card-border);
+            background-color: #0d1117;
+        }
+
+        .index-card.active .chart-container {
+            display: block;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>현황</h1>
+        <p class="subtitle">미국 증시 주요 3대 지수 실시간 캔들 차트 현황</p>
+    </header>
+
+    <div class="index-list">
+        <!-- 나스닥 종합 지수 -->
+        <div class="index-card" id="card-nasdaq">
+            <div class="card-header" onclick="toggleChart('card-nasdaq', 'chart-nasdaq', 'TVC:IXIC')">
+                <div class="index-info">
+                    <div class="index-name">
+                        나스닥 종합지수
+                        <span class="index-code">NASDAQ</span>
+                    </div>
+                    <div class="index-desc">기술주 중심의 대표적인 미국 성장주 지수</div>
+                </div>
+                <div class="toggle-btn">
+                    <span id="btn-text-card-nasdaq">캔들 차트 열기</span>
+                    <div class="arrow-icon"></div>
+                </div>
+            </div>
+            <div class="chart-container" id="chart-nasdaq"></div>
+        </div>
+
+        <!-- S&P 500 지수 -->
+        <div class="index-card" id="card-sp500">
+            <div class="card-header" onclick="toggleChart('card-sp500', 'chart-sp500', 'TVC:SPX')">
+                <div class="index-info">
+                    <div class="index-name">
+                        S&P 500 지수
+                        <span class="index-code">S&P 500</span>
+                    </div>
+                    <div class="index-desc">미국 상장 대형주 500개 기업 대상 시장 대표 지수</div>
+                </div>
+                <div class="toggle-btn">
+                    <span id="btn-text-card-sp500">캔들 차트 열기</span>
+                    <div class="arrow-icon"></div>
+                </div>
+            </div>
+            <div class="chart-container" id="chart-sp500"></div>
+        </div>
+
+        <!-- 다우존스 지수 -->
+        <div class="index-card" id="card-dow">
+            <div class="card-header" onclick="toggleChart('card-dow', 'chart-dow', 'TVC:DJI')">
+                <div class="index-info">
+                    <div class="index-name">
+                        다우존스 산업평균지수
+                        <span class="index-code">DOW JONES</span>
+                    </div>
+                    <div class="index-desc">미국 대표 우량 기업 30개로 구성된 전통 지수</div>
+                </div>
+                <div class="toggle-btn">
+                    <span id="btn-text-card-dow">캔들 차트 열기</span>
+                    <div class="arrow-icon"></div>
+                </div>
+            </div>
+            <div class="chart-container" id="chart-dow"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>※ 본 데이터는 실시간 흐름 참고용이며 투자 권유가 아닙니다.</p>
+    </footer>
+</div>
+
+<!-- TradingView 차트 라이브러리 -->
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<script>
+    const loadedCharts = {};
+
+    function toggleChart(cardId, chartContainerId, symbol) {
+        const card = document.getElementById(cardId);
+        const btnText = document.getElementById('btn-text-' + cardId);
+        const isOpening = !card.classList.contains('active');
+
+        card.classList.toggle('active');
+
+        if (isOpening) {
+            btnText.textContent = '캔들 차트 닫기';
+            // 클릭 시 차트 위젯 로드 (처음 열 때만 생성)
+            if (!loadedCharts[chartContainerId]) {
+                new TradingView.widget({
+                    "autosize": true,
+                    "symbol": symbol,
+                    "interval": "D",
+                    "timezone": "Asia/Seoul",
+                    "theme": "dark",
+                    "style": "1", // 1번 스타일 = 캔들 차트 (Candlestick)
+                    "locale": "kr",
+                    "toolbar_bg": "#0d1117",
+                    "enable_publishing": false,
+                    "hide_side_toolbar": false,
+                    "allow_symbol_change": false,
+                    "container_id": chartContainerId,
+                    "backgroundColor": "#0d1117",
+                    "gridColor": "rgba(35, 43, 56, 0.6)",
+                    "overrides": {
+                        "mainSeriesProperties.candleStyle.upColor": "#22c55e",
+                        "mainSeriesProperties.candleStyle.downColor": "#ef4444",
+                        "mainSeriesProperties.candleStyle.wickUpColor": "#22c55e",
+                        "mainSeriesProperties.candleStyle.wickDownColor": "#ef4444",
+                        "mainSeriesProperties.candleStyle.borderUpColor": "#22c55e",
+                        "mainSeriesProperties.candleStyle.borderDownColor": "#ef4444"
+                    }
+                });
+                loadedCharts[chartContainerId] = true;
+            }
+        } else {
+            btnText.textContent = '캔들 차트 열기';
+        }
+    }
+</script>
+</body>
+</html>
