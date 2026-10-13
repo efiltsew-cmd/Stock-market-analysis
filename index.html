@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>미국 증시 현황</title>
+    <title>미국·해외 증시 현황</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
     <style>
         :root {
@@ -38,13 +38,13 @@
         }
 
         header {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--card-border);
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
             color: #ffffff;
         }
@@ -53,6 +53,84 @@
             font-size: 13px;
             color: var(--text-sub);
             margin-top: 4px;
+        }
+
+        /* 뉴스/이슈 배너 스타일 */
+        .news-banner {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+        }
+
+        .news-tag {
+            background-color: #1e293b;
+            color: var(--text-main);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            white-space: nowrap;
+        }
+
+        .news-title {
+            color: var(--text-main);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 2x2 지수 요약 그리드 카드 */
+        .overview-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .indices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 520px) {
+            .indices-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mini-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 12px;
+            height: 140px;
+            overflow: hidden;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .mini-card:hover {
+            border-color: rgba(51, 209, 182, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* 상세 캔들 차트 섹션 */
+        .section-divider {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 28px 0 14px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .index-list {
@@ -66,7 +144,7 @@
             border: 1px solid var(--card-border);
             border-radius: 12px;
             overflow: hidden;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: border-color 0.2s ease;
         }
 
         .index-card:hover {
@@ -74,7 +152,7 @@
         }
 
         .card-header {
-            padding: 20px;
+            padding: 18px 20px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
@@ -89,7 +167,7 @@
         }
 
         .index-name {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             color: #ffffff;
             display: flex;
@@ -158,19 +236,120 @@
 <div class="container">
     <header>
         <h1>현황</h1>
-        <p class="subtitle">미국 증시 주요 3대 지수 실시간 캔들 차트 현황</p>
+        <p class="subtitle">미국 및 글로벌 주요 증시 실시간 현황 요약</p>
     </header>
+
+    <!-- 실시간 뉴스/이슈 배너 -->
+    <div class="news-banner">
+        <span class="news-tag">미국뉴스</span>
+        <span class="news-title">[뉴욕증시] 반도체·기술주 중심 실시간 시세 및 지수 동향</span>
+    </div>
+
+    <!-- 1. 이미지 형태의 2x2 실시간 지수 요약 그리드 -->
+    <div class="overview-title">주요 지수 한눈에 보기</div>
+    <div class="indices-grid">
+        <!-- 나스닥 종합 -->
+        <div class="mini-card">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                {
+                    "symbol": "NASDAQ:IXIC",
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "kr",
+                    "dateRange": "1D",
+                    "colorTheme": "dark",
+                    "trendLineColor": "#22c55e",
+                    "underLineColor": "rgba(34, 197, 94, 0.12)",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": ""
+                }
+                </script>
+            </div>
+        </div>
+
+        <!-- S&P 500 -->
+        <div class="mini-card">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                {
+                    "symbol": "FOREXCOM:SPXUSD",
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "kr",
+                    "dateRange": "1D",
+                    "colorTheme": "dark",
+                    "trendLineColor": "#22c55e",
+                    "underLineColor": "rgba(34, 197, 94, 0.12)",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": ""
+                }
+                </script>
+            </div>
+        </div>
+
+        <!-- 다우 산업 -->
+        <div class="mini-card">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                {
+                    "symbol": "FOREXCOM:DJI",
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "kr",
+                    "dateRange": "1D",
+                    "colorTheme": "dark",
+                    "trendLineColor": "#22c55e",
+                    "underLineColor": "rgba(34, 197, 94, 0.12)",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": ""
+                }
+                </script>
+            </div>
+        </div>
+
+        <!-- 니케이 225 -->
+        <div class="mini-card">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                {
+                    "symbol": "TVC:NI225",
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "kr",
+                    "dateRange": "1D",
+                    "colorTheme": "dark",
+                    "trendLineColor": "#ef4444",
+                    "underLineColor": "rgba(239, 68, 68, 0.12)",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": ""
+                }
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 펼침형 상세 캔들 차트 섹션 -->
+    <div class="section-divider">지수별 상세 캔들 차트</div>
 
     <div class="index-list">
         <!-- 나스닥 종합 지수 -->
         <div class="index-card" id="card-nasdaq">
-            <div class="card-header" onclick="toggleChart('card-nasdaq', 'chart-nasdaq', 'TVC:IXIC')">
+            <div class="card-header" onclick="toggleChart('card-nasdaq', 'chart-nasdaq', 'NASDAQ:IXIC')">
                 <div class="index-info">
                     <div class="index-name">
-                        나스닥 종합지수
+                        나스닥 종합지수 🇺🇸
                         <span class="index-code">NASDAQ</span>
                     </div>
-                    <div class="index-desc">기술주 중심의 대표적인 미국 성장주 지수</div>
+                    <div class="index-desc">기술주 중심의 대표적인 성장주 지수</div>
                 </div>
                 <div class="toggle-btn">
                     <span id="btn-text-card-nasdaq">캔들 차트 열기</span>
@@ -182,10 +361,10 @@
 
         <!-- S&P 500 지수 -->
         <div class="index-card" id="card-sp500">
-            <div class="card-header" onclick="toggleChart('card-sp500', 'chart-sp500', 'TVC:SPX')">
+            <div class="card-header" onclick="toggleChart('card-sp500', 'chart-sp500', 'FOREXCOM:SPXUSD')">
                 <div class="index-info">
                     <div class="index-name">
-                        S&P 500 지수
+                        S&P 500 지수 🇺🇸
                         <span class="index-code">S&P 500</span>
                     </div>
                     <div class="index-desc">미국 상장 대형주 500개 기업 대상 시장 대표 지수</div>
@@ -200,10 +379,10 @@
 
         <!-- 다우존스 지수 -->
         <div class="index-card" id="card-dow">
-            <div class="card-header" onclick="toggleChart('card-dow', 'chart-dow', 'TVC:DJI')">
+            <div class="card-header" onclick="toggleChart('card-dow', 'chart-dow', 'FOREXCOM:DJI')">
                 <div class="index-info">
                     <div class="index-name">
-                        다우존스 산업평균지수
+                        다우존스 산업평균지수 🇺🇸
                         <span class="index-code">DOW JONES</span>
                     </div>
                     <div class="index-desc">미국 대표 우량 기업 30개로 구성된 전통 지수</div>
@@ -214,6 +393,24 @@
                 </div>
             </div>
             <div class="chart-container" id="chart-dow"></div>
+        </div>
+
+        <!-- 니케이 225 지수 -->
+        <div class="index-card" id="card-nikkei">
+            <div class="card-header" onclick="toggleChart('card-nikkei', 'chart-nikkei', 'TVC:NI225')">
+                <div class="index-info">
+                    <div class="index-name">
+                        니케이 225 지수 🇯🇵
+                        <span class="index-code">NIKKEI 225</span>
+                    </div>
+                    <div class="index-desc">일본 도쿄증권거래소 대표 225개 우량주 지수</div>
+                </div>
+                <div class="toggle-btn">
+                    <span id="btn-text-card-nikkei">캔들 차트 열기</span>
+                    <div class="arrow-icon"></div>
+                </div>
+            </div>
+            <div class="chart-container" id="chart-nikkei"></div>
         </div>
     </div>
 
@@ -236,7 +433,6 @@
 
         if (isOpening) {
             btnText.textContent = '캔들 차트 닫기';
-            // 클릭 시 차트 위젯 로드 (처음 열 때만 생성)
             if (!loadedCharts[chartContainerId]) {
                 new TradingView.widget({
                     "autosize": true,
@@ -244,7 +440,7 @@
                     "interval": "D",
                     "timezone": "Asia/Seoul",
                     "theme": "dark",
-                    "style": "1", // 1번 스타일 = 캔들 차트 (Candlestick)
+                    "style": "1", // 캔들 차트 스타일
                     "locale": "kr",
                     "toolbar_bg": "#0d1117",
                     "enable_publishing": false,
