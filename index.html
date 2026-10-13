@@ -101,14 +101,15 @@
             color: #ffffff;
         }
 
+        /* 미국 3대 지수 3열 그리드 */
         .indices-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 28px;
         }
 
-        @media (max-width: 520px) {
+        @media (max-width: 768px) {
             .indices-grid {
                 grid-template-columns: 1fr;
             }
@@ -119,7 +120,7 @@
             border: 1px solid var(--card-border);
             border-radius: 14px;
             padding: 12px;
-            height: 140px;
+            height: 145px;
             overflow: hidden;
         }
 
@@ -241,6 +242,31 @@
             text-align: center;
         }
 
+        .widget-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .widget-box h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .widget-box .hint {
+            font-size: 12px;
+            color: var(--accent-neon);
+            font-weight: normal;
+        }
+
         .table-wrap {
             overflow-x: auto;
         }
@@ -304,6 +330,9 @@
             color: var(--text-sub);
         }
     </style>
+
+    <!-- 트레이딩뷰 핵심 라이브러리 상단 로드 -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
 
@@ -322,42 +351,32 @@
     <div id="tab-status" class="tab-view active">
         <div class="overview-title">주요 지수 한눈에 보기</div>
         <div class="indices-grid">
-            <!-- 나스닥 100 ETF (QQQ) -->
+            <!-- 나스닥 100 지수 -->
             <div class="mini-card">
                 <div class="tradingview-widget-container">
                     <div class="tradingview-widget-container__widget"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    { "symbol": "NASDAQ:QQQ", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
+                    { "symbol": "CAPITALCOM:US100", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
                     </script>
                 </div>
             </div>
 
-            <!-- S&P 500 ETF (SPY) -->
+            <!-- S&P 500 지수 -->
             <div class="mini-card">
                 <div class="tradingview-widget-container">
                     <div class="tradingview-widget-container__widget"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    { "symbol": "AMEX:SPY", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
+                    { "symbol": "CAPITALCOM:US500", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
                     </script>
                 </div>
             </div>
 
-            <!-- 다우 존스 ETF (DIA) -->
+            <!-- 다우 존스 지수 -->
             <div class="mini-card">
                 <div class="tradingview-widget-container">
                     <div class="tradingview-widget-container__widget"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    { "symbol": "AMEX:DIA", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
-                    </script>
-                </div>
-            </div>
-
-            <!-- 니케이 225 ETF (EWJ) -->
-            <div class="mini-card">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    { "symbol": "NYSEARCA:EWJ", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#ef4444", "underLineColor": "rgba(239, 68, 68, 0.12)", "isTransparent": true, "autosize": true }
+                    { "symbol": "CAPITALCOM:US30", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
                     </script>
                 </div>
             </div>
@@ -367,9 +386,9 @@
         <div class="section-divider">지수별 상세 캔들 차트</div>
         <div class="index-list">
             <div class="index-card" id="card-nasdaq">
-                <div class="card-header" onclick="toggleChart('card-nasdaq', 'chart-nasdaq', 'NASDAQ:QQQ')">
+                <div class="card-header" onclick="toggleChart('card-nasdaq', 'chart-nasdaq', 'CAPITALCOM:US100')">
                     <div class="index-info">
-                        <div class="index-name">나스닥 100 지수 (QQQ) 🇺🇸 <span class="index-code">NASDAQ</span></div>
+                        <div class="index-name">나스닥 100 지수 🇺🇸 <span class="index-code">NASDAQ 100</span></div>
                         <div class="index-desc">기술주 중심의 대표적인 성장주 지수</div>
                     </div>
                     <div class="toggle-btn"><span id="btn-text-card-nasdaq">캔들 차트 열기</span><div class="arrow-icon"></div></div>
@@ -378,218 +397,4 @@
             </div>
 
             <div class="index-card" id="card-sp500">
-                <div class="card-header" onclick="toggleChart('card-sp500', 'chart-sp500', 'AMEX:SPY')">
-                    <div class="index-info">
-                        <div class="index-name">S&P 500 지수 (SPY) 🇺🇸 <span class="index-code">S&P 500</span></div>
-                        <div class="index-desc">미국 대형주 500개 기업 대상 시장 대표 지수</div>
-                    </div>
-                    <div class="toggle-btn"><span id="btn-text-card-sp500">캔들 차트 열기</span><div class="arrow-icon"></div></div>
-                </div>
-                <div class="chart-container" id="chart-sp500"></div>
-            </div>
-
-            <div class="index-card" id="card-dow">
-                <div class="card-header" onclick="toggleChart('card-dow', 'chart-dow', 'AMEX:DIA')">
-                    <div class="index-info">
-                        <div class="index-name">다우존스 지수 (DIA) 🇺🇸 <span class="index-code">DOW JONES</span></div>
-                        <div class="index-desc">미국 대표 우량 기업 30개로 구성된 전통 지수</div>
-                    </div>
-                    <div class="toggle-btn"><span id="btn-text-card-dow">캔들 차트 열기</span><div class="arrow-icon"></div></div>
-                </div>
-                <div class="chart-container" id="chart-dow"></div>
-            </div>
-
-            <div class="index-card" id="card-nikkei">
-                <div class="card-header" onclick="toggleChart('card-nikkei', 'chart-nikkei', 'NYSEARCA:EWJ')">
-                    <div class="index-info">
-                        <div class="index-name">일본 니케이 지수 (EWJ) 🇯🇵 <span class="index-code">NIKKEI</span></div>
-                        <div class="index-desc">일본 시장 대표 대표 우량주 지수</div>
-                    </div>
-                    <div class="toggle-btn"><span id="btn-text-card-nikkei">캔들 차트 열기</span><div class="arrow-icon"></div></div>
-                </div>
-                <div class="chart-container" id="chart-nikkei"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. 경기 사이클 탭 페이지 -->
-    <div id="tab-cycle" class="tab-view">
-        <div class="cycle-intro">
-            피델리티 비즈니스 사이클은 투자자가 시장을 바라볼 때, <strong>"지금 경제가 어느 단계에 있는가"</strong>와 <strong>"다음에는 어떤 산업이 주목받을 가능성이 큰가"</strong>를 판단하는 중요한 틀을 제공합니다.
-        </div>
-
-        <div class="cycle-card">
-            <h2>피델리티 비즈니스 사이클</h2>
-            <div class="table-wrap">
-                <table class="fidelity-table">
-                    <thead>
-                        <tr>
-                            <th>섹터</th>
-                            <th>초기 국면</th>
-                            <th>중간 국면</th>
-                            <th>후기 국면</th>
-                            <th>침체 국면</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="sector-name">금융</td>
-                            <td class="p-weak">+</td>
-                            <td></td>
-                            <td></td>
-                            <td class="m-strong">--</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">부동산</td>
-                            <td class="p-strong">++</td>
-                            <td class="m-weak">-</td>
-                            <td class="p-weak">+</td>
-                            <td class="m-strong">--</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">임의소비재</td>
-                            <td class="p-strong">++</td>
-                            <td></td>
-                            <td class="m-strong">--</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">IT</td>
-                            <td class="p-weak">+</td>
-                            <td class="p-weak">+</td>
-                            <td class="m-weak">-</td>
-                            <td class="m-strong">--</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">산업재</td>
-                            <td class="p-strong">++</td>
-                            <td></td>
-                            <td></td>
-                            <td class="m-strong">--</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">소재</td>
-                            <td class="p-weak">+</td>
-                            <td class="m-strong">--</td>
-                            <td></td>
-                            <td class="m-strong">--</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">필수소비재</td>
-                            <td class="m-strong">--</td>
-                            <td class="m-weak">-</td>
-                            <td class="p-weak">+</td>
-                            <td class="p-strong">++</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">헬스케어</td>
-                            <td class="m-strong">--</td>
-                            <td></td>
-                            <td></td>
-                            <td class="p-strong">++</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">에너지</td>
-                            <td class="m-strong">--</td>
-                            <td></td>
-                            <td class="p-strong">++</td>
-                            <td class="m-strong">--</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">커뮤니케이션 서비스</td>
-                            <td></td>
-                            <td class="p-weak">+</td>
-                            <td></td>
-                            <td class="m-weak">-</td>
-                        </tr>
-                        <tr>
-                            <td class="sector-name">유틸리티</td>
-                            <td class="m-strong">--</td>
-                            <td class="m-weak">-</td>
-                            <td class="p-weak">+</td>
-                            <td class="p-strong">++</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="legend-box">
-                <h4>📌 표에서 표현되는 기호의 의미</h4>
-                <p>• <strong>++ / + (초록색)</strong>: 해당 국면에서 시장 평균(S&P 500 등)보다 높은 수익률을 기록할 확률이 매우 높음(++) 또는 높음(+)</p>
-                <p>• <strong>-- / - (주황/빨강)</strong>: 해당 국면에서 시장 평균보다 낮은 수익률을 기록할 확률이 매우 높음(--) 또는 높음(-)</p>
-                <p>• <strong>빈칸</strong>: 뚜렷한 상관관계가 없거나 성과가 섞여 있음을 의미</p>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <p>※ 본 데이터는 시장 참고용 일반 정보이며 투자 권유가 아닙니다.</p>
-    </footer>
-</div>
-
-<!-- TradingView 차트 라이브러리 정상 로드 -->
-<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-<script type="text/javascript">
-    function switchTab(tabId, btnId) {
-        document.querySelectorAll('.tab-view').forEach(function(view) {
-            view.classList.remove('active');
-        });
-        document.querySelectorAll('.nav-btn').forEach(function(btn) {
-            btn.classList.remove('active');
-        });
-
-        const targetView = document.getElementById(tabId);
-        const targetBtn = document.getElementById(btnId);
-
-        if (targetView) targetView.classList.add('active');
-        if (targetBtn) targetBtn.classList.add('active');
-    }
-
-    const loadedCharts = {};
-    function toggleChart(cardId, chartContainerId, symbol) {
-        const card = document.getElementById(cardId);
-        const btnText = document.getElementById('btn-text-' + cardId);
-
-        if (!card) return;
-
-        const isOpening = !card.classList.contains('active');
-        card.classList.toggle('active');
-
-        if (isOpening) {
-            if (btnText) btnText.textContent = '캔들 차트 닫기';
-            if (!loadedCharts[chartContainerId]) {
-                if (typeof TradingView !== 'undefined') {
-                    new TradingView.widget({
-                        "autosize": true,
-                        "symbol": symbol,
-                        "interval": "D",
-                        "timezone": "Asia/Seoul",
-                        "theme": "dark",
-                        "style": "1",
-                        "locale": "kr",
-                        "toolbar_bg": "#0d1117",
-                        "enable_publishing": false,
-                        "hide_side_toolbar": false,
-                        "allow_symbol_change": false,
-                        "container_id": chartContainerId,
-                        "backgroundColor": "#0d1117",
-                        "gridColor": "rgba(35, 43, 56, 0.6)",
-                        "overrides": {
-                            "mainSeriesProperties.candleStyle.upColor": "#22c55e",
-                            "mainSeriesProperties.candleStyle.downColor": "#ef4444",
-                            "mainSeriesProperties.candleStyle.wickUpColor": "#22c55e",
-                            "mainSeriesProperties.candleStyle.wickDownColor": "#ef4444",
-                            "mainSeriesProperties.candleStyle.borderUpColor": "#22c55e",
-                            "mainSeriesProperties.candleStyle.borderDownColor": "#ef4444"
-                        }
-                    });
-                    loadedCharts[chartContainerId] = true;
-                }
-            }
-        } else {
-            if (btnText) btnText.textContent = '캔들 차트 열기';
-        }
-    }
-</script>
-</body>
-</html>
+                <div class="card-header" onclick="toggleChart('
