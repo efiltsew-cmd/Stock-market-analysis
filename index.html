@@ -85,12 +85,27 @@
             box-shadow: 0 0 15px rgba(51, 209, 182, 0.3);
         }
 
+        /* 안전한 탭 레이아웃 제어 (display:none 대신 오프스크린 숨김 처리로 위젯 스크립트 충돌 방지) */
         .tab-view {
-            display: none;
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 100%;
+            max-width: 860px;
+            opacity: 0;
+            pointer-events: none;
+            height: 0;
+            overflow: hidden;
         }
 
         .tab-view.active {
-            display: block;
+            position: relative;
+            top: 0;
+            left: 0;
+            opacity: 1;
+            pointer-events: auto;
+            height: auto;
+            overflow: visible;
         }
 
         /* [현황 탭] */
@@ -101,7 +116,6 @@
             color: #ffffff;
         }
 
-        /* 미국 3대 지수 3열 그리드 */
         .indices-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -331,7 +345,7 @@
         }
     </style>
 
-    <!-- 트레이딩뷰 핵심 라이브러리 상단 로드 -->
+    <!-- 트레이딩뷰 핵심 라이브러리 -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
@@ -349,34 +363,34 @@
 
     <!-- 1. 현황 탭 페이지 -->
     <div id="tab-status" class="tab-view active">
-        <div class="overview-title">주요 지수 한눈에 보기</div>
+        <div class="overview-title">주요 지수 추종 대표 ETF 현황</div>
         <div class="indices-grid">
-            <!-- 나스닥 100 지수 -->
+            <!-- 나스닥 100 ETF (QQQ) -->
             <div class="mini-card">
                 <div class="tradingview-widget-container">
                     <div class="tradingview-widget-container__widget"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    { "symbol": "CAPITALCOM:US100", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
+                    { "symbol": "NASDAQ:QQQ", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
                     </script>
                 </div>
             </div>
 
-            <!-- S&P 500 지수 -->
+            <!-- S&P 500 ETF (SPY) -->
             <div class="mini-card">
                 <div class="tradingview-widget-container">
                     <div class="tradingview-widget-container__widget"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    { "symbol": "CAPITALCOM:US500", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
+                    { "symbol": "AMEX:SPY", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
                     </script>
                 </div>
             </div>
 
-            <!-- 다우 존스 지수 -->
+            <!-- 다우 존스 ETF (DIA) -->
             <div class="mini-card">
                 <div class="tradingview-widget-container">
                     <div class="tradingview-widget-container__widget"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    { "symbol": "CAPITALCOM:US30", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
+                    { "symbol": "AMEX:DIA", "width": "100%", "height": "100%", "locale": "kr", "dateRange": "1D", "colorTheme": "dark", "trendLineColor": "#22c55e", "underLineColor": "rgba(34, 197, 94, 0.12)", "isTransparent": true, "autosize": true }
                     </script>
                 </div>
             </div>
@@ -386,10 +400,10 @@
         <div class="section-divider">지수별 상세 캔들 차트</div>
         <div class="index-list">
             <div class="index-card" id="card-nasdaq">
-                <div class="card-header" onclick="toggleChart('card-nasdaq', 'chart-nasdaq', 'CAPITALCOM:US100')">
+                <div class="card-header" onclick="toggleChart('card-nasdaq', 'chart-nasdaq', 'NASDAQ:QQQ')">
                     <div class="index-info">
-                        <div class="index-name">나스닥 100 지수 🇺🇸 <span class="index-code">NASDAQ 100</span></div>
-                        <div class="index-desc">기술주 중심의 대표적인 성장주 지수</div>
+                        <div class="index-name">나스닥 100 (QQQ) 🇺🇸 <span class="index-code">NASDAQ 100</span></div>
+                        <div class="index-desc">기술주 중심의 대표적인 성장주 지수 추종 ETF</div>
                     </div>
                     <div class="toggle-btn"><span id="btn-text-card-nasdaq">캔들 차트 열기</span><div class="arrow-icon"></div></div>
                 </div>
@@ -397,4 +411,231 @@
             </div>
 
             <div class="index-card" id="card-sp500">
-                <div class="card-header" onclick="toggleChart('
+                <div class="card-header" onclick="toggleChart('card-sp500', 'chart-sp500', 'AMEX:SPY')">
+                    <div class="index-info">
+                        <div class="index-name">S&P 500 (SPY) 🇺🇸 <span class="index-code">S&P 500</span></div>
+                        <div class="index-desc">미국 대형주 500개 기업 대상 대표 지수 추종 ETF</div>
+                    </div>
+                    <div class="toggle-btn"><span id="btn-text-card-sp500">캔들 차트 열기</span><div class="arrow-icon"></div></div>
+                </div>
+                <div class="chart-container" id="chart-sp500"></div>
+            </div>
+
+            <div class="index-card" id="card-dow">
+                <div class="card-header" onclick="toggleChart('card-dow', 'chart-dow', 'AMEX:DIA')">
+                    <div class="index-info">
+                        <div class="index-name">다우존스 (DIA) 🇺🇸 <span class="index-code">DOW JONES</span></div>
+                        <div class="index-desc">미국 대표 우량 기업 30개 구성 전통 지수 추종 ETF</div>
+                    </div>
+                    <div class="toggle-btn"><span id="btn-text-card-dow">캔들 차트 열기</span><div class="arrow-icon"></div></div>
+                </div>
+                <div class="chart-container" id="chart-dow"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 경기 사이클 탭 페이지 -->
+    <div id="tab-cycle" class="tab-view">
+        <div class="cycle-intro">
+            피델리티 비즈니스 사이클은 투자자가 시장을 바라볼 때, <strong>"지금 경제가 어느 단계에 있는가"</strong>와 <strong>"다음에는 어떤 산업이 주목받을 가능성이 큰가"</strong>를 판단하는 중요한 틀을 제공합니다.
+        </div>
+
+        <!-- 1) 미국 S&P 500 섹터 실시간 히트맵 -->
+        <div class="widget-box">
+            <h3>
+                미국 증시 섹터별 실시간 히트맵
+                <span class="hint">💡 상단 메뉴에서 1일·1주·1달·3달 기간을 선택할 수 있습니다.</span>
+            </h3>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
+                {
+                    "exchanges": [],
+                    "dataSource": "SPX500",
+                    "grouping": "sector",
+                    "blockSize": "market_cap_basic",
+                    "blockColor": "change",
+                    "locale": "kr",
+                    "symbolUrl": "",
+                    "colorTheme": "dark",
+                    "hasTopBar": true,
+                    "isDataSetEnabled": true,
+                    "isZoomEnabled": true,
+                    "hasSymbolTooltip": true,
+                    "width": "100%",
+                    "height": "520"
+                }
+                </script>
+            </div>
+        </div>
+
+        <!-- 2) 미국 11개 핵심 섹터 ETF 실시간 시세표 -->
+        <div class="widget-box">
+            <h3>미국 11개 핵심 섹터 ETF 실시간 현황</h3>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+                {
+                    "width": "100%",
+                    "height": "480",
+                    "symbolsGroups": [
+                        {
+                            "name": "미국 11개 핵심 섹터 대표 ETF",
+                            "originalName": "Sectors",
+                            "symbols": [
+                                { "name": "AMEX:XLK", "displayName": "IT / 반도체 (XLK)" },
+                                { "name": "AMEX:XLF", "displayName": "금융 (XLF)" },
+                                { "name": "AMEX:XLV", "displayName": "헬스케어 (XLV)" },
+                                { "name": "AMEX:XLY", "displayName": "임의소비재 (XLY)" },
+                                { "name": "AMEX:XLI", "displayName": "산업재 (XLI)" },
+                                { "name": "AMEX:XLC", "displayName": "커뮤니케이션 (XLC)" },
+                                { "name": "AMEX:XLP", "displayName": "필수소비재 (XLP)" },
+                                { "name": "AMEX:XLE", "displayName": "에너지 (XLE)" },
+                                { "name": "AMEX:XLB", "displayName": "소재 (XLB)" },
+                                { "name": "AMEX:XLU", "displayName": "유틸리티 (XLU)" },
+                                { "name": "AMEX:XLRE", "displayName": "부동산 (XLRE)" }
+                            ]
+                        }
+                    ],
+                    "showSymbolLogo": true,
+                    "isTransparent": false,
+                    "colorTheme": "dark",
+                    "locale": "kr"
+                }
+                </script>
+            </div>
+        </div>
+
+        <!-- 3) 피델리티 비즈니스 사이클 모델 표 -->
+        <div class="cycle-card">
+            <h2>피델리티 비즈니스 사이클 모델</h2>
+            <div class="table-wrap">
+                <table class="fidelity-table">
+                    <thead>
+                        <tr>
+                            <th>섹터</th>
+                            <th>초기 국면</th>
+                            <th>중간 국면</th>
+                            <th>후기 국면</th>
+                            <th>침체 국면</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="sector-name">금융 (XLF)</td>
+                            <td class="p-weak">+</td>
+                            <td></td>
+                            <td></td>
+                            <td class="m-strong">--</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">부동산 (XLRE)</td>
+                            <td class="p-strong">++</td>
+                            <td class="m-weak">-</td>
+                            <td class="p-weak">+</td>
+                            <td class="m-strong">--</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">임의소비재 (XLY)</td>
+                            <td class="p-strong">++</td>
+                            <td></td>
+                            <td class="m-strong">--</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">IT (XLK)</td>
+                            <td class="p-weak">+</td>
+                            <td class="p-weak">+</td>
+                            <td class="m-weak">-</td>
+                            <td class="m-strong">--</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">산업재 (XLI)</td>
+                            <td class="p-strong">++</td>
+                            <td></td>
+                            <td></td>
+                            <td class="m-strong">--</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">소재 (XLB)</td>
+                            <td class="p-weak">+</td>
+                            <td class="m-strong">--</td>
+                            <td></td>
+                            <td class="m-strong">--</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">필수소비재 (XLP)</td>
+                            <td class="m-strong">--</td>
+                            <td class="m-weak">-</td>
+                            <td class="p-weak">+</td>
+                            <td class="p-strong">++</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">헬스케어 (XLV)</td>
+                            <td class="m-strong">--</td>
+                            <td></td>
+                            <td></td>
+                            <td class="p-strong">++</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">에너지 (XLE)</td>
+                            <td class="m-strong">--</td>
+                            <td></td>
+                            <td class="p-strong">++</td>
+                            <td class="m-strong">--</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">커뮤니케이션 (XLC)</td>
+                            <td></td>
+                            <td class="p-weak">+</td>
+                            <td></td>
+                            <td class="m-weak">-</td>
+                        </tr>
+                        <tr>
+                            <td class="sector-name">유틸리티 (XLU)</td>
+                            <td class="m-strong">--</td>
+                            <td class="m-weak">-</td>
+                            <td class="p-weak">+</td>
+                            <td class="p-strong">++</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="legend-box">
+                <h4>📌 표에서 표현되는 기호의 의미</h4>
+                <p>• <strong>++ / + (초록색)</strong>: 해당 국면에서 시장 평균(S&P 500 등)보다 높은 수익률을 기록할 확률이 매우 높음(++) 또는 높음(+)</p>
+                <p>• <strong>-- / - (주황/빨강)</strong>: 해당 국면에서 시장 평균보다 낮은 수익률을 기록할 확률이 매우 높음(--) 또는 높음(-)</p>
+                <p>• <strong>빈칸</strong>: 뚜렷한 상관관계가 없거나 성과가 섞여 있음을 의미</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>※ 본 데이터는 시장 참고용 일반 정보이며 투자 권유가 아닙니다.</p>
+    </footer>
+</div>
+
+<script type="text/javascript">
+    function switchTab(tabId, btnId) {
+        document.querySelectorAll('.tab-view').forEach(function(view) {
+            view.classList.remove('active');
+        });
+        document.querySelectorAll('.nav-btn').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+
+        const targetView = document.getElementById(tabId);
+        const targetBtn = document.getElementById(btnId);
+
+        if (targetView) targetView.classList.add('active');
+        if (targetBtn) targetBtn.classList.add('active');
+
+        // 위젯 리사이즈 이벤트 강제 트리거
+        window.dispatchEvent(new Event('resize'));
+    }
+
+    const loadedCharts = {};
+    function toggleChart(cardId, chartContainerId, symbol) {
+        const card = document.getElementById(cardId);
+        const btnText = document.getElementById('
