@@ -30,6 +30,17 @@ KR = {
  "조선": "HD한국조선해양:009540.KS HD현대중공업:329180.KS 삼성중공업:010140.KS 한화오션:042660.KS HD현대미포:010620.KS 한화엔진:082740.KS HD현대마린엔진:071970.KS 세진중공업:075580.KS 동성화인텍:033500.KQ STX엔진:077970.KS",
 }
 
+# 미국 테마별 대표 종목 (미국 상장, 조선은 전업 종목이 적어 해양·해운 위주)
+UST = {
+ "반도체": "NVDA TSM AVGO AMD ASML MU QCOM AMAT LRCX INTC",
+ "원자력·SMR": "CEG VST CCJ BWXT SMR OKLO LEU NNE UEC GEV",
+ "로보틱스": "ISRG TSLA SYM TER ROK ABBNY PRCT SERV ZBRA CGNX",
+ "2차전지": "ALB SQM ENVX QS EOSE FLNC SLDP MP TSLA ENS",
+ "방위산업": "LMT RTX NOC GD LHX HII KTOS AVAV LDOS TDG",
+ "항공우주": "BA GE HWM TDG RKLB ASTS LUNR PL SPR RDW",
+ "조선·해운": "HII GD KEX MATX DAC ZIM FRO STNG SBLK GSL",
+}
+
 # 한국 WICS(GICS 기반) 11개 섹터: 섹터별 대표 종목 (직접 분류, 최대 10개)
 KRS = {
  "에너지": "SK이노베이션:096770.KS S-Oil:010950.KS GS:078930.KS HD현대:267250.KS 흥구석유:024060.KS 중앙에너비스:000440.KS SK가스:018670.KS 극동유화:014530.KS 한국ANKOR유전:152550.KS",
@@ -48,6 +59,7 @@ KRS = {
 kr = {k: [x.split(":") for x in v.split()] for k, v in KR.items()}
 krs = {k: [x.split(":") for x in v.split()] for k, v in KRS.items()}
 tickers = set(IDX.values())
+tickers |= {t for s in UST.values() for t in s.split()}
 for c, (_, s) in US.items():
     tickers |= {c, *s.split()}
 for v in [*kr.values(), *krs.values()]:
@@ -71,6 +83,7 @@ def sec(k, v):
 
 out = {
  "krs": [sec(k, v) for k, v in krs.items()],
+ "ust": [{"n": k, "s": [{"t": t, "q": q(t)} for t in s.split()]} for k, s in UST.items()],
  "updated": datetime.datetime.utcnow().isoformat() + "Z",
  "indices": [{"n": n, **(q(t) or {})} for n, t in IDX.items()],
  "us": [{"n": n, "t": c, "q": q(c), "s": [{"t": t, "q": q(t)} for t in s.split()]} for c, (n, s) in US.items()],
@@ -98,7 +111,7 @@ def ohlc(ts, nd):
                   for k, c in zip("ohlc", ["Open", "High", "Low", "Close"])}
     return {"dates": [str(i.date()) for i in d.index], "s": res}
 
-us_t = {c for c in US} | {t for _, s in US.values() for t in s.split()}
+us_t = {c for c in US} | {t for _, s in US.values() for t in s.split()} | {t for s in UST.values() for t in s.split()}
 kr_t = {t for v in [*kr.values(), *krs.values()] for _, t in v}
 json.dump(ohlc(us_t, 2), open("us_hist.json", "w"), ensure_ascii=False)
 json.dump(ohlc(kr_t, 0), open("kr_hist.json", "w"), ensure_ascii=False)
