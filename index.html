@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>증시 현황</title>
+<style>
+:root{--bg:#0f1117;--card:#1a1d27;--tx:#e6e8ee;--mu:#8b90a0;--bd:#2a2e3b;--up:#ff5a5f;--dn:#4d9dff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Malgun Gothic",sans-serif;padding:12px;max-width:900px;margin:auto}
+h1{font-size:18px;margin:4px 0}
+.sub{color:var(--mu);font-size:12px;margin-bottom:10px}
+.tabs{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.tabs button{flex:1;padding:10px;border:1px solid var(--bd);background:var(--card);color:var(--mu);border-radius:8px;font-size:14px}
+.tabs button.on{background:#2d3350;color:#fff;border-color:#4d5a99}
+.sec{display:none}.sec.on{display:block}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card);border-radius:8px;overflow:hidden}
+th,td{padding:9px 8px;text-align:right;border-bottom:1px solid var(--bd)}
+th{color:var(--mu);font-weight:500;font-size:12px}
+th:first-child,td:first-child{text-align:left}
+.up{color:var(--up)}.dn{color:var(--dn)}
+details{background:var(--card);border-radius:8px;margin-bottom:8px;border:1px solid var(--bd)}
+summary{padding:12px;cursor:pointer;display:flex;justify-content:space-between;font-size:14px}
+details table{border-radius:0}
+.sub2{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.sub2 button{padding:8px 12px;border:1px solid var(--bd);background:var(--card);color:var(--mu);border-radius:16px;font-size:13px}
+.sub2 button.on{background:#2d3350;color:#fff}
+.note{color:var(--mu);font-size:11px;margin-top:10px}
+</style>
+</head>
+<body>
+<h1>📈 증시 현황</h1>
+<div class="sub" id="upd">불러오는 중…</div>
+<div class="tabs" id="tabs">
+  <button data-t="a" class="on">현황</button>
+  <button data-t="b">미국 증시</button>
+  <button data-t="c">한국 증시</button>
+</div>
+<div id="a" class="sec on"></div>
+<div id="b" class="sec"></div>
+<div id="c" class="sec"></div>
+<div class="note">상승=빨강, 하락=파랑 (한국식). 데이터: Yahoo Finance, 전일 종가 대비. 미국 섹터 지수는 섹터 ETF 기준, 종목은 대표 상위 10개.</div>
+<script>
+const f=(n,d=2)=>Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const cl=r=>r>0?'up':r<0?'dn':'';
+const sg=n=>n>0?'+':'';
+const cells=(q,d=2)=>q&&q.p!=null?`<td>${f(q.p,d)}</td><td class="${cl(q.r)}">${sg(q.c)}${f(q.c,d)}</td><td class="${cl(q.r)}">${sg(q.r)}${f(q.r)}%</td>`:'<td colspan="3">-</td>';
+const head=(a)=>`<tr><th>${a}</th><th>현재가</th><th>전일비</th><th>등락률</th></tr>`;
+
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#tabs button,.sec').forEach(e=>e.classList.remove('on'));
+  b.classList.add('on');document.getElementById(b.dataset.t).classList.add('on');
+});
+
+fetch('data.json?'+Date.now()).then(r=>r.json()).then(D=>{
+  document.getElementById('upd').textContent='마지막 갱신: '+new Date(D.updated).toLocaleString('ko-KR');
+
+  // 현황
+  document.getElementById('a').innerHTML='<table>'+head('지수').replace('</tr>','<th>기준일</th></tr>')+
+    D.indices.map(i=>`<tr><td>${i.n}</td>${cells(i)}<td>${i.d||'-'}</td></tr>`).join('')+'</table>';
+
+  // 미국
+  document.getElementById('b').innerHTML=D.us.map(s=>`<details><summary><span>${s.n} <small style="color:var(--mu)">${s.t}</small></span>
+    <span class="${cl(s.q&&s.q.r)}">${s.q?f(s.q.p)+' ('+sg(s.q.r)+f(s.q.r)+'%)':'-'}</span></summary>
+    <table>${head('종목 Top 10')}${s.s.map(x=>`<tr><td>${x.t}</td>${cells(x.q)}</tr>`).join('')}</table></details>`).join('');
+
+  // 한국
+  const kc=document.getElementById('c');
+  kc.innerHTML='<div class="sub2"></div><div class="tbl"></div>';
+  const bar=kc.querySelector('.sub2'),tb=kc.querySelector('.tbl');
+  const show=i=>{
+    [...bar.children].forEach((b,j)=>b.classList.toggle('on',i===j));
+    tb.innerHTML='<table>'+head(D.kr[i].n+' Top 10')+D.kr[i].s.map(x=>`<tr><td>${x.n}</td>${cells(x.q,0)}</tr>`).join('')+'</table>';
+  };
+  D.kr.forEach((k,i)=>{const b=document.createElement('button');b.textContent=k.n;b.onclick=()=>show(i);bar.appendChild(b)});
+  show(0);
+}).catch(()=>{document.getElementById('upd').textContent='data.json이 아직 없어요. GitHub Actions에서 update-data를 한 번 실행해 주세요.'});
+</script>
+</body>
+</html>
