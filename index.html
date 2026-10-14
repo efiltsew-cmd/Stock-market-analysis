@@ -32,6 +32,8 @@ details table{border-radius:0}
 .nm{font-size:14px;color:var(--mu)}.pr{font-size:22px;font-weight:700;margin:4px 0}.ch{font-size:13px}
 .chartbox{margin-top:10px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px}
 #ct{width:100%}.lg{font-size:12px;color:var(--mu);padding:6px 4px}
+.ii{display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;background:#2d3350;color:#f5c542;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px}
+.fb{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-size:13px;border:1px solid transparent}.fb span{width:70px}.fb i{display:block;height:10px;border-radius:5px;min-width:4px}.fb b{margin-left:auto}.fb.on{background:#232842;border-color:#4d5a99}.fh{font-size:16px;margin:8px 0}
 .cl{cursor:pointer}.cr td{padding:4px;text-align:left}.cb{min-height:60px;font-size:12px;color:var(--mu)}
 .cb a,.fv{color:var(--dn);font-size:13px;text-decoration:none}.fv{display:inline-block;margin-bottom:8px}
 </style>
@@ -60,6 +62,50 @@ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#tabs button,.sec').forEach(e=>e.classList.remove('on'));
   b.classList.add('on');document.getElementById(b.dataset.t).classList.add('on');
 });
+
+// 피델리티 비즈니스 사이클: [초기,중간,후기,침체] (++=2, +=1, -=-1, --=-2)
+const FT={'금융':[1,0,0,-1],'부동산':[2,-1,1,-2],'경기소비재':[2,0,-2,0],'정보기술':[1,1,-1,-2],'산업재':[2,0,0,-2],'소재':[1,-2,0,-1],'필수소비재':[-2,-1,1,2],'헬스케어':[-2,0,0,2],'에너지':[-2,0,2,-2],'커뮤니케이션':[0,1,0,-1],'유틸리티':[-2,-1,1,2]};
+const AL={'경기관련소비재':'경기소비재','건강관리':'헬스케어','IT':'정보기술','커뮤니케이션서비스':'커뮤니케이션'};
+const SI={'정보기술':['성장주','경기 민감','미래 이익 기대·금리 민감, IT 투자 사이클 영향'],'커뮤니케이션':['성장주','경기 민감','광고·플랫폼 매출이 경기와 직결'],'경기소비재':['성장주','경기 민감','소비 여력에 따라 실적 변동 큼'],'산업재':['가치주','경기 민감','설비·인프라·물류, 경기 확장기에 강세'],'소재':['가치주','경기 민감','원자재·건설·제조 사이클 영향'],'에너지':['가치주','경기 민감','유가·경기·지정학에 직접 노출'],'금융':['가치주','경기 민감','금리·대출·경기 순환의 핵심'],'부동산':['가치주','경기 민감','금리·경기·상업활동 영향 큼'],'헬스케어':['혼합(성장+가치)','경기 방어','필수 수요 + 일부 혁신 성장'],'필수소비재':['가치주','경기 방어','불황에도 소비 유지'],'유틸리티':['가치주','경기 방어','규제 산업·안정적 현금흐름']};
+const PH=['초기','중간','후기','침체'];
+const sym=v=>v>0?'+'.repeat(v):v<0?'−'.repeat(-v):'';
+const lastIdx=a=>{for(let i=a.length-1;i>=0;i--)if(a[i]!=null)return i;return -1};
+const rt=(a,k)=>{const i=lastIdx(a);if(i<0)return null;let j=i-k;while(j>=0&&a[j]==null)j--;return j<0?null:(a[i]/a[j]-1)*100};
+
+function makeSub(id,names,cb){
+  const w=document.getElementById(id);
+  w.innerHTML='<div class="sub2">'+names.map((n,i)=>`<button data-i="${i}">${n}</button>`).join('')+'</div>'+names.map((_,i)=>`<div id="${id}${i+1}" style="display:none"></div>`).join('');
+  const nav=w.querySelector('.sub2'),done={};
+  const go=i=>{[...nav.children].forEach((b,j)=>b.classList.toggle('on',i===j));names.forEach((_,j)=>document.getElementById(id+(j+1)).style.display=i===j?'block':'none');
+    if(i>0&&!done[i]){done[i]=1;cb(i,document.getElementById(id+(i+1)))}};
+  nav.onclick=e=>{const b=e.target.closest('button');if(b)go(+b.dataset.i)};
+  go(0);
+}
+
+async function renderFlow(el,mk,D){
+  el.textContent='불러오는 중…';
+  try{
+    const [H,B]=await Promise.all([hist(mk),fetch('history.json?'+Date.now()).then(r=>r.json())]);
+    const bm=mk==='us'?'S&P 500':'코스피',b=rt(B[bm].map(x=>x[4]),63);
+    const secs=mk==='us'?D.us.map(s=>[s.n,H.s[s.t]?rt(H.s[s.t].c,63):null])
+      :D.krs.map(s=>{const r=s.s.map(x=>H.s[x.t]?rt(H.s[x.t].c,63):null).filter(v=>v!=null);return [AL[s.n]||s.n,r.length?r.reduce((a,v)=>a+v)/r.length:null]});
+    const ex=secs.filter(s=>s[1]!=null&&FT[s[0]]).map(s=>[s[0],s[1]-b]);
+    const sc=PH.map((_,p)=>{let a=0,w=0;ex.forEach(([n,e])=>{const v=FT[n][p];a+=v*e;w+=Math.abs(v)});return a/w});
+    const top=sc.indexOf(Math.max(...sc));
+    const bars=sc.map((v,p)=>`<div class="fb ${p===top?'on':''}"><span>${PH[p]} 국면</span><i style="width:${Math.min(70,Math.abs(v)*10+4)}%;background:${v>=0?'var(--up)':'var(--dn)'}"></i><b>${sg(v)}${f(v,1)}</b></div>`).join('');
+    const rows=ex.sort((x,y)=>y[1]-x[1]).map(([n,e])=>`<tr><td>${n}<span class="ii" data-n="${n}">!</span></td><td class="${cl(e)}">${sg(e)}${f(e,1)}</td>${FT[n].map(v=>`<td class="${v>0?'up':v<0?'dn':''}">${sym(v)}</td>`).join('')}</tr>`).join('');
+    el.innerHTML=`<div class="fh">현재 추정 국면: <b>${PH[top]} 국면</b></div>${bars}
+      <div class="note" style="margin:6px 0 10px">최근 3개월 섹터 수익률에서 ${bm} 수익률(${sg(b)}${f(b,1)}%)을 뺀 초과수익이, 피델리티 표의 국면별 강세·약세 패턴과 얼마나 닮았는지 점수화한 추정치예요(막대=가중평균 초과수익 %p). 참고용입니다.</div>
+      <table><tr><th>섹터 (!=의미)</th><th>3M 초과</th>${PH.map(p=>`<th>${p}</th>`).join('')}</tr>${rows}</table>
+      <table style="margin-top:10px"><tr><th>구분</th><th>경기 민감</th><th>경기 방어</th></tr>
+      <tr><td>성장주</td><td>IT, 커뮤니케이션, 경기소비재</td><td>헬스케어(일부 혁신)</td></tr>
+      <tr><td>가치주</td><td>금융, 산업재, 에너지, 소재, 부동산</td><td>필수소비재, 유틸리티</td></tr></table>`;
+    el.onclick=e=>{const t=e.target.closest('.ii');if(!t)return;const tr=t.closest('tr'),nx=tr.nextElementSibling;
+      if(nx&&nx.classList.contains('ir')){nx.remove();return}
+      const s=SI[t.dataset.n],r=document.createElement('tr');r.className='ir';
+      r.innerHTML=`<td colspan="6" style="text-align:left;color:var(--mu);font-size:12px">${s[0]} · ${s[1]} — ${s[2]}</td>`;tr.after(r)};
+  }catch(_){el.textContent='데이터가 없어요. Actions에서 update-data를 먼저 실행해 주세요.'}
+}
 
 const HC={};
 const hist=m=>HC[m]||(HC[m]=fetch(m+'_hist.json?'+Date.now()).then(r=>r.json()));
@@ -127,12 +173,12 @@ fetch('data.json?'+Date.now()).then(r=>r.json()).then(D=>{
   }).catch(()=>{document.getElementById('ct').textContent='history.json이 아직 없어요. Actions에서 update-data를 한 번 실행해 주세요.'});
 
   // 미국
-  document.getElementById('b').innerHTML='<a class="fv" href="https://finviz.com/map.ashx" target="_blank">Finviz 히트맵 열기 ↗</a><div class="note" style="margin:0 0 8px">종목을 누르면 캔들 차트가 열립니다.</div>'+D.us.map(s=>`<details><summary><span>${s.n} <small style="color:var(--mu)">${s.t}</small></span>
+  makeSub('b',['섹터·종목','시장 흐름'],(i,el)=>renderFlow(el,'us',D));document.getElementById('b1').innerHTML='<a class="fv" href="https://finviz.com/map.ashx" target="_blank">Finviz 히트맵 열기 ↗</a><div class="note" style="margin:0 0 8px">종목을 누르면 캔들 차트가 열립니다.</div>'+D.us.map(s=>`<details><summary><span>${s.n} <small style="color:var(--mu)">${s.t}</small></span>
     <span class="${cl(s.q&&s.q.r)}">${s.q?f(s.q.p)+' ('+sg(s.q.r)+f(s.q.r)+'%)':'-'}</span></summary>
     <table>${head('종목 Top 10')}<tr class="cl" data-m="us" data-t="${s.t}"><td>섹터 지수(${s.t})</td>${cells(s.q)}</tr>${s.s.map(x=>`<tr class="cl" data-m="us" data-t="${x.t}"><td>${x.t}</td>${cells(x.q)}</tr>`).join('')}</table></details>`).join('');
 
   // 한국
-  const kc=document.getElementById('c');
+  makeSub('c',['테마·섹터','시장 흐름'],(i,el)=>renderFlow(el,'kr',D));const kc=document.getElementById('c1');
   kc.innerHTML='<div class="sub2" id="km"></div><div class="sub2" id="kb"></div><div class="tbl"></div>';
   const bar=kc.querySelector('#kb'),tb=kc.querySelector('.tbl');let G=D.kr;
   const show=i=>{
