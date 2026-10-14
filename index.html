@@ -8,116 +8,79 @@
 :root{--bg:#0f1117;--card:#1a1d27;--tx:#e6e8ee;--mu:#8b90a0;--bd:#2a2e3b;--up:#ff5a5f;--dn:#4d9dff}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Malgun Gothic",sans-serif;padding:12px;max-width:900px;margin:auto}
-h1{font-size:18px;margin:4px 0}
+h1{font-size:18px;margin:4px 0}h2{font-size:15px;margin:16px 0 8px}
 .sub{color:var(--mu);font-size:12px;margin-bottom:10px}
-.tabs{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;margin:8px 0}
 .tabs button{flex:1;padding:10px;border:1px solid var(--bd);background:var(--card);color:var(--mu);border-radius:8px;font-size:14px}
 .tabs button.on{background:#2d3350;color:#fff;border-color:#4d5a99}
-.sec{display:none}.sec.on{display:block}
+.tabs.mk button{padding:8px;font-size:13px;border-radius:16px}
 table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card);border-radius:8px;overflow:hidden}
 th,td{padding:9px 8px;text-align:right;border-bottom:1px solid var(--bd)}
 th{color:var(--mu);font-weight:500;font-size:12px}
 th:first-child,td:first-child{text-align:left}
 .up{color:var(--up)}.dn{color:var(--dn)}
-details{background:var(--card);border-radius:8px;margin-bottom:8px;border:1px solid var(--bd)}
-summary{padding:12px;cursor:pointer;display:flex;justify-content:space-between;font-size:14px}
-details table{border-radius:0}
 .sub2{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .sub2 button{padding:8px 12px;border:1px solid var(--bd);background:var(--card);color:var(--mu);border-radius:16px;font-size:13px}
 .sub2 button.on{background:#2d3350;color:#fff}
-.note{color:var(--mu);font-size:11px;margin-top:10px}
+.note{color:var(--mu);font-size:11px;margin-top:10px;line-height:1.5}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:8px}
 .card{padding:12px;border-radius:10px;cursor:pointer;border:1px solid transparent}
 .card.on{background:#232842;border-color:#4d5a99}
 .nm{font-size:14px;color:var(--mu)}.pr{font-size:22px;font-weight:700;margin:4px 0}.ch{font-size:13px}
 .chartbox{margin-top:10px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px}
-#ct{width:100%}.lg{font-size:12px;color:var(--mu);padding:6px 4px}
-.ii{display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;background:#2d3350;color:#f5c542;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px}
-.fb{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-size:13px;border:1px solid transparent}.fb span{width:70px}.fb i{display:block;height:10px;border-radius:5px;min-width:4px}.fb b{margin-left:auto}.fb.on{background:#232842;border-color:#4d5a99}.fh{font-size:16px;margin:8px 0}
+#ct{width:100%}.lg{font-size:12px;color:var(--mu);padding:6px 4px;line-height:1.6}
 .cl{cursor:pointer}.cr td{padding:4px;text-align:left}.cb{min-height:60px;font-size:12px;color:var(--mu)}
 .cb a,.fv{color:var(--dn);font-size:13px;text-decoration:none}.fv{display:inline-block;margin-bottom:8px}
+.ii{display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;background:#2d3350;color:#f5c542;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{border-radius:12px;padding:12px;border:1px solid var(--bd)}
+.tn{font-size:13px}.tv{font-size:24px;font-weight:700;margin:6px 0}.ts{font-size:12px;color:#d5d8e0;opacity:.85}
+.pc{text-align:center}.pc.g{background:#1f6b4d;color:#fff}.pc.r{background:#8f3a3a;color:#fff}
+.bd{display:inline-block;background:#f5c542;color:#222;border-radius:8px;padding:1px 6px;font-size:10px;margin-top:3px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
 <h1>📈 증시 현황</h1>
 <div class="sub" id="upd">불러오는 중…</div>
-<div class="tabs" id="tabs">
-  <button data-t="a" class="on">현황</button>
-  <button data-t="b">미국 증시</button>
-  <button data-t="c">한국 증시</button>
-</div>
-<div id="a" class="sec on"></div>
-<div id="b" class="sec"></div>
-<div id="c" class="sec"></div>
-<div class="note">상승=빨강, 하락=파랑 (한국식). 데이터: Yahoo Finance, 전일 종가 대비. 미국 섹터 지수는 섹터 ETF 기준, 종목은 대표 상위 10개.</div>
+<div class="tabs" id="tabs"></div>
+<div class="tabs mk" id="mk"></div>
+<div id="view"></div>
+<div class="note">데이터: Yahoo Finance, 전일 종가 대비(상승=빨강, 하락=파랑). 흐름 탭의 히트맵·표는 상승=초록, 하락=빨강. 미국 섹터 지수는 섹터 ETF 기준, 종목은 대표 상위 10개. ※ 참고용 일반 정보이며 투자 권유가 아닙니다.</div>
 <script>
+const $=s=>document.querySelector(s);
 const f=(n,d=2)=>Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const cl=r=>r>0?'up':r<0?'dn':'';
 const sg=n=>n>0?'+':'';
 const cells=(q,d=2)=>q&&q.p!=null?`<td>${f(q.p,d)}</td><td class="${cl(q.r)}">${sg(q.c)}${f(q.c,d)}</td><td class="${cl(q.r)}">${sg(q.r)}${f(q.r)}%</td>`:'<td colspan="3">-</td>';
-const head=(a)=>`<tr><th>${a}</th><th>현재가</th><th>전일비</th><th>등락률</th></tr>`;
-
-document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('#tabs button,.sec').forEach(e=>e.classList.remove('on'));
-  b.classList.add('on');document.getElementById(b.dataset.t).classList.add('on');
-});
+const head=a=>`<tr><th>${a}</th><th>현재가</th><th>전일비</th><th>등락률</th></tr>`;
 
 // 피델리티 비즈니스 사이클: [초기,중간,후기,침체] (++=2, +=1, -=-1, --=-2)
-const FT={'금융':[1,0,0,-1],'부동산':[2,-1,1,-2],'경기소비재':[2,0,-2,0],'정보기술':[1,1,-1,-2],'산업재':[2,0,0,-2],'소재':[1,-2,0,-1],'필수소비재':[-2,-1,1,2],'헬스케어':[-2,0,0,2],'에너지':[-2,0,2,-2],'커뮤니케이션':[0,1,0,-1],'유틸리티':[-2,-1,1,2]};
-const AL={'경기관련소비재':'경기소비재','건강관리':'헬스케어','IT':'정보기술','커뮤니케이션서비스':'커뮤니케이션'};
-const SI={'정보기술':['성장주','경기 민감','미래 이익 기대·금리 민감, IT 투자 사이클 영향'],'커뮤니케이션':['성장주','경기 민감','광고·플랫폼 매출이 경기와 직결'],'경기소비재':['성장주','경기 민감','소비 여력에 따라 실적 변동 큼'],'산업재':['가치주','경기 민감','설비·인프라·물류, 경기 확장기에 강세'],'소재':['가치주','경기 민감','원자재·건설·제조 사이클 영향'],'에너지':['가치주','경기 민감','유가·경기·지정학에 직접 노출'],'금융':['가치주','경기 민감','금리·대출·경기 순환의 핵심'],'부동산':['가치주','경기 민감','금리·경기·상업활동 영향 큼'],'헬스케어':['혼합(성장+가치)','경기 방어','필수 수요 + 일부 혁신 성장'],'필수소비재':['가치주','경기 방어','불황에도 소비 유지'],'유틸리티':['가치주','경기 방어','규제 산업·안정적 현금흐름']};
+const FT={'금융':[1,0,0,-1],'부동산':[2,-1,1,-2],'임의소비재':[2,0,-2,0],'IT':[1,1,-1,-2],'산업재':[2,0,0,-2],'소재':[1,-2,0,-1],'필수소비재':[-2,-1,1,2],'헬스케어':[-2,0,0,2],'에너지':[-2,0,2,-2],'커뮤니케이션 서비스':[0,1,0,-1],'유틸리티':[-2,-1,1,2]};
+const AL={'경기소비재':'임의소비재','경기관련소비재':'임의소비재','건강관리':'헬스케어','정보기술':'IT','커뮤니케이션':'커뮤니케이션 서비스','커뮤니케이션서비스':'커뮤니케이션 서비스'};
+const SI={'IT':['성장주','경기 민감','미래 이익 기대·금리 민감, IT 투자 사이클 영향'],'커뮤니케이션 서비스':['성장주','경기 민감','광고·플랫폼 매출이 경기와 직결'],'임의소비재':['성장주','경기 민감','소비 여력에 따라 실적 변동 큼'],'산업재':['가치주','경기 민감','설비·인프라·물류, 경기 확장기에 강세'],'소재':['가치주','경기 민감','원자재·건설·제조 사이클 영향'],'에너지':['가치주','경기 민감','유가·경기·지정학에 직접 노출'],'금융':['가치주','경기 민감','금리·대출·경기 순환의 핵심'],'부동산':['가치주','경기 민감','금리·경기·상업활동 영향 큼'],'헬스케어':['혼합(성장+가치)','경기 방어','필수 수요 + 일부 혁신 성장'],'필수소비재':['가치주','경기 방어','불황에도 소비 유지'],'유틸리티':['가치주','경기 방어','규제 산업·안정적 현금흐름']};
 const PH=['초기','중간','후기','침체'];
+const PD=[['1일',1],['1주',5],['1개월',21],['3개월',63],['6개월',126]];
 const sym=v=>v>0?'+'.repeat(v):v<0?'−'.repeat(-v):'';
 const lastIdx=a=>{for(let i=a.length-1;i>=0;i--)if(a[i]!=null)return i;return -1};
 const rt=(a,k)=>{const i=lastIdx(a);if(i<0)return null;let j=i-k;while(j>=0&&a[j]==null)j--;return j<0?null:(a[i]/a[j]-1)*100};
 
-function makeSub(id,names,cb){
-  const w=document.getElementById(id);
-  w.innerHTML='<div class="sub2">'+names.map((n,i)=>`<button data-i="${i}">${n}</button>`).join('')+'</div>'+names.map((_,i)=>`<div id="${id}${i+1}" style="display:none"></div>`).join('');
-  const nav=w.querySelector('.sub2'),done={};
-  const go=i=>{[...nav.children].forEach((b,j)=>b.classList.toggle('on',i===j));names.forEach((_,j)=>document.getElementById(id+(j+1)).style.display=i===j?'block':'none');
-    if(i>0&&!done[i]){done[i]=1;cb(i,document.getElementById(id+(i+1)))}};
-  nav.onclick=e=>{const b=e.target.closest('button');if(b)go(+b.dataset.i)};
-  go(0);
-}
-
-async function renderFlow(el,mk,D){
-  el.textContent='불러오는 중…';
-  try{
-    const [H,B]=await Promise.all([hist(mk),fetch('history.json?'+Date.now()).then(r=>r.json())]);
-    const bm=mk==='us'?'S&P 500':'코스피',b=rt(B[bm].map(x=>x[4]),63);
-    const secs=mk==='us'?D.us.map(s=>[s.n,H.s[s.t]?rt(H.s[s.t].c,63):null])
-      :D.krs.map(s=>{const r=s.s.map(x=>H.s[x.t]?rt(H.s[x.t].c,63):null).filter(v=>v!=null);return [AL[s.n]||s.n,r.length?r.reduce((a,v)=>a+v)/r.length:null]});
-    const ex=secs.filter(s=>s[1]!=null&&FT[s[0]]).map(s=>[s[0],s[1]-b]);
-    const sc=PH.map((_,p)=>{let a=0,w=0;ex.forEach(([n,e])=>{const v=FT[n][p];a+=v*e;w+=Math.abs(v)});return a/w});
-    const top=sc.indexOf(Math.max(...sc));
-    const bars=sc.map((v,p)=>`<div class="fb ${p===top?'on':''}"><span>${PH[p]} 국면</span><i style="width:${Math.min(70,Math.abs(v)*10+4)}%;background:${v>=0?'var(--up)':'var(--dn)'}"></i><b>${sg(v)}${f(v,1)}</b></div>`).join('');
-    const rows=ex.sort((x,y)=>y[1]-x[1]).map(([n,e])=>`<tr><td>${n}<span class="ii" data-n="${n}">!</span></td><td class="${cl(e)}">${sg(e)}${f(e,1)}</td>${FT[n].map(v=>`<td class="${v>0?'up':v<0?'dn':''}">${sym(v)}</td>`).join('')}</tr>`).join('');
-    el.innerHTML=`<div class="fh">현재 추정 국면: <b>${PH[top]} 국면</b></div>${bars}
-      <div class="note" style="margin:6px 0 10px">최근 3개월 섹터 수익률에서 ${bm} 수익률(${sg(b)}${f(b,1)}%)을 뺀 초과수익이, 피델리티 표의 국면별 강세·약세 패턴과 얼마나 닮았는지 점수화한 추정치예요(막대=가중평균 초과수익 %p). 참고용입니다.</div>
-      <table><tr><th>섹터 (!=의미)</th><th>3M 초과</th>${PH.map(p=>`<th>${p}</th>`).join('')}</tr>${rows}</table>
-      <table style="margin-top:10px"><tr><th>구분</th><th>경기 민감</th><th>경기 방어</th></tr>
-      <tr><td>성장주</td><td>IT, 커뮤니케이션, 경기소비재</td><td>헬스케어(일부 혁신)</td></tr>
-      <tr><td>가치주</td><td>금융, 산업재, 에너지, 소재, 부동산</td><td>필수소비재, 유틸리티</td></tr></table>`;
-    el.onclick=e=>{const t=e.target.closest('.ii');if(!t)return;const tr=t.closest('tr'),nx=tr.nextElementSibling;
-      if(nx&&nx.classList.contains('ir')){nx.remove();return}
-      const s=SI[t.dataset.n],r=document.createElement('tr');r.className='ir';
-      r.innerHTML=`<td colspan="6" style="text-align:left;color:var(--mu);font-size:12px">${s[0]} · ${s[1]} — ${s[2]}</td>`;tr.after(r)};
-  }catch(_){el.textContent='데이터가 없어요. Actions에서 update-data를 먼저 실행해 주세요.'}
-}
-
 const HC={};
 const hist=m=>HC[m]||(HC[m]=fetch(m+'_hist.json?'+Date.now()).then(r=>r.json()));
-function buildChart(el,d){
-  const ch=LightweightCharts.createChart(el,{width:el.clientWidth,height:300,layout:{background:{color:'#1a1d27'},textColor:'#8b90a0'},grid:{vertLines:{color:'#2a2e3b'},horzLines:{color:'#2a2e3b'}},rightPriceScale:{borderColor:'#2a2e3b'},timeScale:{borderColor:'#2a2e3b'}});
+const HJ=()=>HC.idx||(HC.idx=fetch('history.json?'+Date.now()).then(r=>r.json()));
+
+function buildChart(el,d,h=300){
+  const ch=LightweightCharts.createChart(el,{width:el.clientWidth,height:h,layout:{background:{color:'#1a1d27'},textColor:'#8b90a0'},grid:{vertLines:{color:'#2a2e3b'},horzLines:{color:'#2a2e3b'}},rightPriceScale:{borderColor:'#2a2e3b'},timeScale:{borderColor:'#2a2e3b'}});
   ch.addCandlestickSeries({upColor:'#ff5a5f',downColor:'#4d9dff',borderUpColor:'#ff5a5f',borderDownColor:'#4d9dff',wickUpColor:'#ff5a5f',wickDownColor:'#4d9dff'}).setData(d);
   [[50,'#f5c542'],[100,'#4ade80'],[200,'#c084fc']].forEach(([n,c])=>{
     const o=[];for(let i=n-1;i<d.length;i++){let s=0;for(let m=i-n+1;m<=i;m++)s+=d[m].close;o.push({time:d[i].time,value:s/n})}
     ch.addLineSeries({color:c,lineWidth:2,priceLineVisible:false,lastValueVisible:false}).setData(o);
   });
   ch.timeScale().setVisibleLogicalRange({from:Math.max(0,d.length-250),to:d.length+3});
+  window._rs=()=>ch.applyOptions({width:el.clientWidth});
 }
+window.onresize=()=>window._rs&&window._rs();
+
 function trend(d){
   const n=d.length,c=d[n-1].close,ma=(k,e=n)=>e>=k?d.slice(e-k,e).reduce((a,x)=>a+x.close,0)/k:null;
   const m50=ma(50),m100=ma(100),m200=ma(200),p200=ma(200,n-20);
@@ -131,6 +94,8 @@ function trend(d){
   const R=(k,t)=>ret(k)==null?'':` ${t} ${sg(ret(k))}${f(ret(k),1)}%`;
   return `<b class="${sc>0?'up':sc<0?'dn':''}">${lab}</b> · 이평선 ${al}`+(m200?` · 200일선 대비 ${sg(c/m200-1)}${f((c/m200-1)*100,1)}%`:'')+` · 52주 고점 대비 ${f((c/hi-1)*100,1)}% · 저점 대비 +${f((c/lo-1)*100,1)}%<br>수익률:${R(21,'1M')}${R(63,'3M')}${R(126,'6M')}${R(249,'1Y')} <span style="opacity:.7">(규칙 기반 참고용)</span>`;
 }
+
+// 종목 행 클릭 → 캔들 차트 + 이동평균선 + 추세
 document.addEventListener('click',async e=>{
   const tr=e.target.closest('tr.cl');if(!tr)return;
   const nx=tr.nextElementSibling;
@@ -148,48 +113,95 @@ document.addEventListener('click',async e=>{
   }catch(_){el.textContent='차트 데이터가 없어요. Actions에서 update-data를 다시 실행해 주세요.'}
 });
 
-fetch('data.json?'+Date.now()).then(r=>r.json()).then(D=>{
-  document.getElementById('upd').textContent='마지막 갱신: '+new Date(D.updated).toLocaleString('ko-KR');
+let D,T=0,M='us';
+const TABS=['지수','흐름','섹터','테마'];
+function nav(){
+  $('#tabs').innerHTML=TABS.map((t,i)=>`<button data-i="${i}" class="${i===T?'on':''}">${t}</button>`).join('');
+  $('#mk').style.display=T===0?'none':'flex';
+  $('#mk').innerHTML=[['us','미국 시장'],['kr','한국 시장']].map(([k,n])=>`<button data-k="${k}" class="${k===M?'on':''}">${n}</button>`).join('');
+}
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(b){T=+b.dataset.i;go()}};
+$('#mk').onclick=e=>{const b=e.target.closest('button');if(b){M=b.dataset.k;go()}};
+function go(){nav();[idxView,flowView,secView,themeView][T]($('#view'))}
 
-  // 현황
-  document.getElementById('a').innerHTML='<div class="grid">'+D.indices.map((i,k)=>`<div class="card" data-k="${k}"><div class="nm">${i.n}</div><div class="pr">${i.p!=null?f(i.p):'-'}</div><div class="ch ${cl(i.r)}">${i.p!=null?(i.c>0?'▲':i.c<0?'▼':'')+' '+f(Math.abs(i.c))+'('+sg(i.r)+f(i.r)+'%)':''}</div></div>`).join('')+
+// ① 지수
+function idxView(el){
+  el.innerHTML='<div class="grid">'+D.indices.map((i,k)=>`<div class="card" data-k="${k}"><div class="nm">${i.n}</div><div class="pr">${i.p!=null?f(i.p):'-'}</div><div class="ch ${cl(i.r)}">${i.p!=null?(i.c>0?'▲':i.c<0?'▼':'')+' '+f(Math.abs(i.c))+'('+sg(i.r)+f(i.r)+'%)':''}</div></div>`).join('')+
     '</div><div class="chartbox"><div id="ct"></div><div class="lg">이동평균선: <span style="color:#f5c542">━ 50일</span> <span style="color:#4ade80">━ 100일</span> <span style="color:#c084fc">━ 200일</span></div></div>';
-  fetch('history.json?'+Date.now()).then(r=>r.json()).then(Hs=>{
-    const el=document.getElementById('ct');
-    const ch=LightweightCharts.createChart(el,{width:el.clientWidth,height:360,layout:{background:{color:'#1a1d27'},textColor:'#8b90a0'},grid:{vertLines:{color:'#2a2e3b'},horzLines:{color:'#2a2e3b'}},rightPriceScale:{borderColor:'#2a2e3b'},timeScale:{borderColor:'#2a2e3b'}});
-    const cs=ch.addCandlestickSeries({upColor:'#ff5a5f',downColor:'#4d9dff',borderUpColor:'#ff5a5f',borderDownColor:'#4d9dff',wickUpColor:'#ff5a5f',wickDownColor:'#4d9dff'});
-    const MA=[[50,'#f5c542'],[100,'#4ade80'],[200,'#c084fc']];
-    const ms=MA.map(([n,c])=>ch.addLineSeries({color:c,lineWidth:2,priceLineVisible:false,lastValueVisible:false}));
+  HJ().then(Hs=>{
     const draw=k=>{
       const d=Hs[D.indices[k].n].map(x=>({time:x[0],open:x[1],high:x[2],low:x[3],close:x[4]}));
-      cs.setData(d);
-      MA.forEach(([n],j)=>{const o=[];for(let i=n-1;i<d.length;i++){let s=0;for(let m=i-n+1;m<=i;m++)s+=d[m].close;o.push({time:d[i].time,value:s/n})}ms[j].setData(o)});
-      ch.timeScale().setVisibleLogicalRange({from:Math.max(0,d.length-250),to:d.length+3});
-      document.querySelectorAll('.card').forEach((c,j)=>c.classList.toggle('on',j===k));
+      $('#ct').innerHTML='';buildChart($('#ct'),d,360);
+      el.querySelectorAll('.card').forEach((c,j)=>c.classList.toggle('on',j===k));
     };
-    document.querySelectorAll('.card').forEach(c=>c.onclick=()=>draw(+c.dataset.k));
-    window.addEventListener('resize',()=>ch.applyOptions({width:el.clientWidth}));
+    el.querySelectorAll('.card').forEach(c=>c.onclick=()=>draw(+c.dataset.k));
     draw(0);
-  }).catch(()=>{document.getElementById('ct').textContent='history.json이 아직 없어요. Actions에서 update-data를 한 번 실행해 주세요.'});
+  }).catch(()=>{$('#ct').textContent='history.json이 아직 없어요. Actions에서 update-data를 실행해 주세요.'});
+}
 
-  // 미국
-  makeSub('b',['섹터·종목','시장 흐름'],(i,el)=>renderFlow(el,'us',D));document.getElementById('b1').innerHTML='<a class="fv" href="https://finviz.com/map.ashx" target="_blank">Finviz 히트맵 열기 ↗</a><div class="note" style="margin:0 0 8px">종목을 누르면 캔들 차트가 열립니다.</div>'+D.us.map(s=>`<details><summary><span>${s.n} <small style="color:var(--mu)">${s.t}</small></span>
-    <span class="${cl(s.q&&s.q.r)}">${s.q?f(s.q.p)+' ('+sg(s.q.r)+f(s.q.r)+'%)':'-'}</span></summary>
-    <table>${head('종목 Top 10')}<tr class="cl" data-m="us" data-t="${s.t}"><td>섹터 지수(${s.t})</td>${cells(s.q)}</tr>${s.s.map(x=>`<tr class="cl" data-m="us" data-t="${x.t}"><td>${x.t}</td>${cells(x.q)}</tr>`).join('')}</table></details>`).join('');
-
-  // 한국
-  makeSub('c',['테마·섹터','시장 흐름'],(i,el)=>renderFlow(el,'kr',D));const kc=document.getElementById('c1');
-  kc.innerHTML='<div class="sub2" id="km"></div><div class="sub2" id="kb"></div><div class="tbl"></div>';
-  const bar=kc.querySelector('#kb'),tb=kc.querySelector('.tbl');let G=D.kr;
+// ③④ 섹터/테마 공통 목록 (그룹 버튼 + 종목 표)
+function listView(el,gs,nd,mk,extra=''){
+  el.innerHTML=extra+'<div class="sub2" id="gb"></div><div id="gt"></div>';
+  const bar=$('#gb'),tb=$('#gt');
   const show=i=>{
-    [...bar.children].forEach((b,j)=>b.classList.toggle('on',i===j));
-    tb.innerHTML='<table>'+head(G[i].n+(G[i].a!=null?' · 평균 '+sg(G[i].a)+f(G[i].a)+'%':'')+' Top 10')+G[i].s.map(x=>`<tr class="cl" data-m="kr" data-t="${x.t}"><td>${x.n}</td>${cells(x.q,0)}</tr>`).join('')+'</table>';
+    [...bar.children].forEach((b,j)=>b.classList.toggle('on',i===j));const g=gs[i];
+    tb.innerHTML='<table>'+head(g.n+(g.a!=null?' · 평균 '+sg(g.a)+f(g.a)+'%':'')+' Top 10')+
+      (g.e?`<tr class="cl" data-m="${mk}" data-t="${g.e.t}"><td>섹터 지수(${g.e.t})</td>${cells(g.e.q,nd)}</tr>`:'')+
+      g.s.map(x=>`<tr class="cl" data-m="${mk}" data-t="${x.t}"><td>${x.n||x.t}</td>${cells(x.q,nd)}</tr>`).join('')+'</table><div class="note">종목을 누르면 캔들 차트가 열립니다.</div>';
   };
-  const setG=g=>{G=g;bar.innerHTML='';G.forEach((k,i)=>{const b=document.createElement('button');b.textContent=k.n;b.onclick=()=>show(i);bar.appendChild(b)});show(0)};
-  const mb=kc.querySelector('#km');
-  [['테마별',D.kr],['섹터별(WICS)',D.krs]].forEach(([t,g],j)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{[...mb.children].forEach((x,k)=>x.classList.toggle('on',k===j));setG(g)};mb.appendChild(b)});
-  mb.children[0].click();
-}).catch(()=>{document.getElementById('upd').textContent='data.json이 아직 없어요. GitHub Actions에서 update-data를 한 번 실행해 주세요.'});
+  gs.forEach((g,i)=>{const b=document.createElement('button');b.textContent=g.n;b.onclick=()=>show(i);bar.appendChild(b)});
+  show(0);
+}
+const FV='<a class="fv" href="https://finviz.com/map.ashx" target="_blank">Finviz 히트맵 열기 ↗</a>';
+function secView(el){
+  if(M==='us')listView(el,D.us.map(s=>({n:s.n,e:{t:s.t,q:s.q},s:s.s})),2,'us',FV);
+  else listView(el,D.krs,0,'kr');
+}
+function themeView(el){
+  if(M==='us')listView(el,D.ust,2,'us');
+  else listView(el,D.kr,0,'kr');
+}
+
+// ② 흐름: 섹터 히트맵 + 피델리티 국면별 섹터 패턴
+async function flowView(el){
+  el.textContent='불러오는 중…';
+  try{
+    const [H,B]=await Promise.all([hist(M),HJ()]);
+    const bm=M==='us'?'S&P 500':'코스피',bc=B[bm].map(x=>x[4]);
+    const src=M==='us'?D.us.map(s=>({n:AL[s.n]||s.n,t:s.t,c:[H.s[s.t]&&H.s[s.t].c].filter(Boolean)}))
+      :D.krs.map(s=>({n:AL[s.n]||s.n,t:'',c:s.s.map(x=>H.s[x.t]&&H.s[x.t].c).filter(Boolean)}));
+    const rows=src.map(r=>({n:r.n,t:r.t,r:PD.map(([,k])=>{const v=r.c.map(a=>rt(a,k)).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b)/v.length:null})}));
+    const br=PD.map(([,k])=>rt(bc,k));
+    const ex=rows.filter(r=>FT[r.n]&&r.r[3]!=null).map(r=>({n:r.n,e3:r.r[3]-br[3],e6:r.r[4]==null?null:r.r[4]-br[4]}));
+    const sc=PH.map((_,i)=>{let a=0,w=0;ex.forEach(x=>{const v=FT[x.n][i];a+=v*x.e3;w+=Math.abs(v)});return a/w});
+    const top=sc.indexOf(Math.max(...sc));
+    const tbl=Object.keys(FT).map(n=>{const x=ex.find(y=>y.n===n);
+      return `<tr><td>${n}<span class="ii" data-n="${n}">!</span></td>${FT[n].map(v=>`<td class="pc ${v>0?'g':v<0?'r':''}">${sym(v)}</td>`).join('')}`+
+        (x?`<td class="${cl(x.e3)}">${sg(x.e3)}${f(x.e3,1)}%</td><td class="${x.e6==null?'':cl(x.e6)}">${x.e6==null?'-':sg(x.e6)+f(x.e6,1)+'%'}</td>`:'<td>-</td><td>-</td>')+'</tr>'}).join('');
+    el.innerHTML=(M==='us'?FV:'')+`<h2 style="margin-top:4px">섹터 히트맵</h2><div class="sub2" id="pb">${PD.map(([n],i)=>`<button data-i="${i}">${n}</button>`).join('')}</div><div class="tg" id="tiles"></div>
+      <h2>피델리티 국면별 섹터 패턴</h2><div style="margin-bottom:6px">현재 추정 국면: <b>${PH[top]} 국면</b></div>
+      <table><tr><th>섹터</th>${PH.map((p,i)=>`<th style="text-align:center">${p}${i===top?'<br><span class="bd">섹터</span>':''}</th>`).join('')}<th>3개월 상대</th><th>6개월 상대</th></tr>${tbl}</table>
+      <div class="note">++ / + : 해당 국면에서 시장보다 높은 수익률 확률이 매우 높음 / 높음, −− / − : 낮은 확률, 빈칸: 뚜렷한 상관 없음. 상대 수익률은 ${bm} 대비 %p입니다. '섹터' 배지는 최근 3개월 섹터 초과수익 패턴이 피델리티 표와 가장 닮은 국면(추정)이며 실제 경기 지표와 다를 수 있어요. 섹터 이름 옆 "!"를 누르면 섹터의 성격이 열립니다.</div>
+      <table style="margin-top:10px"><tr><th>구분</th><th>경기 민감</th><th>경기 방어</th></tr><tr><td>성장주</td><td>IT, 커뮤니케이션, 임의소비재</td><td>헬스케어(일부 혁신)</td></tr><tr><td>가치주</td><td>금융, 산업재, 에너지, 소재, 부동산</td><td>필수소비재, 유틸리티</td></tr></table>`;
+    let p=3;const pb=$('#pb');
+    const draw=()=>{
+      [...pb.children].forEach((b,j)=>b.classList.toggle('on',j===p));
+      const list=rows.filter(r=>r.r[p]!=null).sort((a,b)=>b.r[p]-a.r[p]);
+      const mx=Math.max(...list.map(r=>Math.abs(r.r[p])),1);
+      $('#tiles').innerHTML=list.map(r=>{const v=r.r[p],a=(0.25+0.6*Math.min(1,Math.abs(v)/mx)).toFixed(2),rel=v-br[p];
+        return `<div class="tile" style="background:${v>=0?`rgba(34,160,110,${a})`:`rgba(200,70,60,${a})`}"><div class="tn">${r.n}${r.t?' · '+r.t:''}</div><div class="tv">${sg(v)}${f(v,1)}%</div><div class="ts">${bm} 대비 ${PD[p][0]} ${sg(rel)}${f(rel,1)}%</div></div>`}).join('');
+    };
+    pb.onclick=e=>{const b=e.target.closest('button');if(b){p=+b.dataset.i;draw()}};draw();
+    el.onclick=e=>{const t=e.target.closest('.ii');if(!t)return;const tr=t.closest('tr'),nx=tr.nextElementSibling;
+      if(nx&&nx.classList.contains('ir')){nx.remove();return}
+      const s=SI[t.dataset.n],r=document.createElement('tr');r.className='ir';
+      r.innerHTML=`<td colspan="7" style="text-align:left;color:var(--mu);font-size:12px">${s[0]} · ${s[1]} — ${s[2]}</td>`;tr.after(r)};
+  }catch(_){el.textContent='차트용 데이터가 없어요. Actions에서 update-data를 먼저 실행해 주세요.'}
+}
+
+fetch('data.json?'+Date.now()).then(r=>r.json()).then(d=>{
+  D=d;$('#upd').textContent='마지막 갱신: '+new Date(D.updated).toLocaleString('ko-KR');go();
+}).catch(()=>{$('#upd').textContent='data.json이 아직 없어요. GitHub Actions에서 update-data를 한 번 실행해 주세요.'});
 </script>
 </body>
 </html>
