@@ -2,7 +2,7 @@ import json, datetime
 import yfinance as yf
 
 IDX = {"나스닥": "^IXIC", "S&P 500": "^GSPC", "다우존스": "^DJI",
-       "니케이 225": "^N225", "코스피": "^KS11", "코스닥": "^KQ11"}
+       "코스피": "^KS11", "코스닥": "^KQ11", "니케이 225": "^N225"}
 
 # 미국: 섹터 ETF(섹터 지수 대용) + 대표 상위 10종목
 US = {
@@ -55,3 +55,10 @@ out = {
  "kr": [{"n": k, "s": [{"n": n, "t": t, "q": q(t)} for n, t in v]} for k, v in kr.items()],
 }
 json.dump(out, open("data.json", "w"), ensure_ascii=False)
+
+# 지수 캔들 차트용 일봉 (3년)
+hist = {}
+for n, t in IDX.items():
+    h = yf.Ticker(t).history(period="3y", auto_adjust=False).dropna(subset=["Close"])
+    hist[n] = [[str(i.date()), round(r.Open, 2), round(r.High, 2), round(r.Low, 2), round(r.Close, 2)] for i, r in h.iterrows()]
+json.dump(hist, open("history.json", "w"), ensure_ascii=False)
