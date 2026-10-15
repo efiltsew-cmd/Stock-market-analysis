@@ -115,3 +115,30 @@ us_t = {c for c in US} | {t for _, s in US.values() for t in s.split()} | {t for
 kr_t = {t for v in [*kr.values(), *krs.values()] for _, t in v}
 json.dump(ohlc(us_t, 2), open("us_hist.json", "w"), ensure_ascii=False)
 json.dump(ohlc(kr_t, 0), open("kr_hist.json", "w"), ensure_ascii=False)
+
+# 밸류에이션(PER·PEG): 테마 종목만. 실패해도 위 데이터는 그대로 저장되도록 보호
+try:
+    from concurrent.futures import ThreadPoolExecutor
+
+    def num(x):
+        return round(float(x), 2) if isinstance(x, (int, float)) and x == x and abs(x) != float("inf") else None
+
+    def val(t):
+        try:
+            i = yf.Ticker(t).info
+        except Exception:
+            return t, {}
+        pe, fpe = i.get("trailingPE"), i.get("forwardPE")
+        peg = i.get("pegRatio") or i.get("trailingPegRatio")
+        if peg is None:  # Yahoo에 없으면 선행 이익 증가율로 추정
+            te, fe = i.get("trailingEps"), i.get("forwardEps")
+            if isinstance(pe, (int, float)) and isinstance(te, (int, float)) and isinstance(fe, (int, float)) and te > 0 and fe > te:
+                peg = pe / ((fe / te - 1) * 100)
+        return t, {"pe": num(pe), "fpe": num(fpe), "peg": num(peg)}
+
+    vt = {t for s in UST.values() for t in s.split()} | {t for v in kr.values() for _, t in v}
+    with ThreadPoolExecutor(4) as ex:
+        vals = dict(ex.map(val, sorted(vt)))
+    json.dump(vals, open("val.json", "w"), ensure_ascii=False)
+except Exception as e:
+    print("밸류에이션 수집 실패:", e)
