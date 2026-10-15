@@ -32,6 +32,8 @@ th:first-child,td:first-child{text-align:left}
 .cl{cursor:pointer}.cr td{padding:4px;text-align:left}.cb{min-height:60px;font-size:12px;color:var(--mu)}
 .cb a,.fv{color:var(--dn);font-size:13px;text-decoration:none}.fv{display:inline-block;margin-bottom:8px}
 .ii{display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;background:#2d3350;color:#f5c542;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px}
+.ohlc{position:absolute;top:4px;left:8px;z-index:5;font-size:12px;color:#d5d8e0;background:rgba(26,29,39,.88);padding:3px 8px;border-radius:6px;pointer-events:none;max-width:calc(100% - 70px)}
+#rf{margin-left:6px;padding:4px 10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:12px;font-size:12px}
 .tg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .tile{border-radius:12px;padding:12px;border:1px solid var(--bd)}
 .tn{font-size:13px}.tv{font-size:24px;font-weight:700;margin:6px 0}.ts{font-size:12px;color:#d5d8e0;opacity:.85}
@@ -42,7 +44,7 @@ th:first-child,td:first-child{text-align:left}
 </head>
 <body>
 <h1>📈 증시 현황</h1>
-<div class="sub" id="upd">불러오는 중…</div>
+<div class="sub"><span id="upd">불러오는 중…</span><button id="rf" onclick="refresh()">🔄 데이터 갱신</button></div>
 <div class="tabs" id="tabs"></div>
 <div class="tabs mk" id="mk"></div>
 <div id="view"></div>
@@ -71,7 +73,14 @@ const HJ=()=>HC.idx||(HC.idx=fetch('history.json?'+Date.now()).then(r=>r.json())
 
 function buildChart(el,d,h=300){
   const ch=LightweightCharts.createChart(el,{width:el.clientWidth,height:h,layout:{background:{color:'#1a1d27'},textColor:'#8b90a0'},grid:{vertLines:{color:'#2a2e3b'},horzLines:{color:'#2a2e3b'}},rightPriceScale:{borderColor:'#2a2e3b'},timeScale:{borderColor:'#2a2e3b'}});
-  ch.addCandlestickSeries({upColor:'#ff5a5f',downColor:'#4d9dff',borderUpColor:'#ff5a5f',borderDownColor:'#4d9dff',wickUpColor:'#ff5a5f',wickDownColor:'#4d9dff'}).setData(d);
+  const cs=ch.addCandlestickSeries({upColor:'#ff5a5f',downColor:'#4d9dff',borderUpColor:'#ff5a5f',borderDownColor:'#4d9dff',wickUpColor:'#ff5a5f',wickDownColor:'#4d9dff'});cs.setData(d);
+  el.style.position='relative';
+  const ol=document.createElement('div');ol.className='ohlc';ol.textContent='차트를 누르면 날짜·시가·고가·저가·종가가 표시돼요';el.appendChild(ol);
+  const fm=v=>Number.isInteger(v)?f(v,0):f(v,2);
+  const show=p=>{const c=p&&p.seriesData&&p.seriesData.get(cs);if(!c||!p.time)return;
+    const t=typeof p.time==='string'?p.time:`${p.time.year}-${String(p.time.month).padStart(2,'0')}-${String(p.time.day).padStart(2,'0')}`;
+    ol.innerHTML=`${t} · 시 ${fm(c.open)} · 고 <span class="up">${fm(c.high)}</span> · 저 <span class="dn">${fm(c.low)}</span> · 종 ${fm(c.close)}`};
+  ch.subscribeCrosshairMove(show);ch.subscribeClick(show);
   [[50,'#f5c542'],[100,'#4ade80'],[200,'#c084fc']].forEach(([n,c])=>{
     const o=[];for(let i=n-1;i<d.length;i++){let s=0;for(let m=i-n+1;m<=i;m++)s+=d[m].close;o.push({time:d[i].time,value:s/n})}
     ch.addLineSeries({color:c,lineWidth:2,priceLineVisible:false,lastValueVisible:false}).setData(o);
@@ -100,7 +109,7 @@ document.addEventListener('click',async e=>{
   const tr=e.target.closest('tr.cl');if(!tr)return;
   const nx=tr.nextElementSibling;
   if(nx&&nx.classList.contains('cr')){nx.remove();return}
-  const r=document.createElement('tr');r.className='cr';r.innerHTML='<td colspan="4"><div class="cb">불러오는 중…</div></td>';tr.after(r);
+  const r=document.createElement('tr');r.className='cr';r.innerHTML='<td colspan="6"><div class="cb">불러오는 중…</div></td>';tr.after(r);
   const el=r.querySelector('.cb'),m=tr.dataset.m,t=tr.dataset.t;
   try{
     const H=await hist(m),s=H.s[t],d=[];
@@ -140,14 +149,18 @@ function idxView(el){
 }
 
 // ③④ 섹터/테마 공통 목록 (그룹 버튼 + 종목 표)
-function listView(el,gs,nd,mk,extra=''){
+const headV=a=>`<tr><th>${a}</th><th>현재가</th><th>등락률</th><th>PER</th><th>PEG</th></tr>`;
+const c2=(q,d)=>q&&q.p!=null?`<td>${f(q.p,d)}</td><td class="${cl(q.r)}">${sg(q.r)}${f(q.r)}%</td>`:'<td colspan="2">-</td>';
+const pv=(x,V)=>{const v=V[x.t]||{};return `<td>${v.pe!=null?f(v.pe,1):'-'}${v.fpe!=null?`<br><small style="color:var(--mu)">선행 ${f(v.fpe,1)}</small>`:''}</td><td>${v.peg!=null?f(v.peg,2):'-'}</td>`};
+const VJ=()=>HC.val||(HC.val=fetch('val.json?'+Date.now()).then(r=>r.json()).catch(()=>({})));
+function listView(el,gs,nd,mk,extra='',V=null){
   el.innerHTML=extra+'<div class="sub2" id="gb"></div><div id="gt"></div>';
   const bar=$('#gb'),tb=$('#gt');
   const show=i=>{
     [...bar.children].forEach((b,j)=>b.classList.toggle('on',i===j));const g=gs[i];
-    tb.innerHTML='<table>'+head(g.n+(g.a!=null?' · 평균 '+sg(g.a)+f(g.a)+'%':'')+' Top 10')+
+    tb.innerHTML='<table>'+(V?headV:head)(g.n+(g.a!=null?' · 평균 '+sg(g.a)+f(g.a)+'%':'')+' Top 10')+
       (g.e?`<tr class="cl" data-m="${mk}" data-t="${g.e.t}"><td>섹터 지수(${g.e.t})</td>${cells(g.e.q,nd)}</tr>`:'')+
-      g.s.map(x=>`<tr class="cl" data-m="${mk}" data-t="${x.t}"><td>${x.n||x.t}</td>${cells(x.q,nd)}</tr>`).join('')+'</table><div class="note">종목을 누르면 캔들 차트가 열립니다.</div>';
+      g.s.map(x=>`<tr class="cl" data-m="${mk}" data-t="${x.t}"><td>${x.n||x.t}</td>${V?c2(x.q,nd)+pv(x,V):cells(x.q,nd)}</tr>`).join('')+'</table><div class="note">종목을 누르면 캔들 차트가 열립니다.'+(V?' PER=후행 PER(작은 글씨는 선행 PER). PEG는 Yahoo 값이며 없으면 선행 이익 증가율로 추정, 적자·데이터 없음은 "-". 데이터는 갱신 시점마다 달라질 수 있어요.':'')+'</div>';
   };
   gs.forEach((g,i)=>{const b=document.createElement('button');b.textContent=g.n;b.onclick=()=>show(i);bar.appendChild(b)});
   show(0);
@@ -157,10 +170,12 @@ function secView(el){
   if(M==='us')listView(el,D.us.map(s=>({n:s.n,e:{t:s.t,q:s.q},s:s.s})),2,'us',FV);
   else listView(el,D.krs,0,'kr');
 }
-function themeView(el){
-  if(M==='us')listView(el,D.ust,2,'us');
-  else listView(el,D.kr,0,'kr');
+async function themeView(el){
+  const V=await VJ();
+  if(M==='us')listView(el,D.ust,2,'us','',V);
+  else listView(el,D.kr,0,'kr','',V);
 }
+const FK='<a class="fv" href="https://www.tradingview.com/heatmap/stock/" target="_blank">TradingView 히트맵 열기 ↗ (왼쪽 위에서 South Korea 선택)</a>';
 
 // ② 흐름: 섹터 히트맵 + 피델리티 국면별 섹터 패턴
 async function flowView(el){
@@ -178,7 +193,7 @@ async function flowView(el){
     const tbl=Object.keys(FT).map(n=>{const x=ex.find(y=>y.n===n);
       return `<tr><td>${n}<span class="ii" data-n="${n}">!</span></td>${FT[n].map(v=>`<td class="pc ${v>0?'g':v<0?'r':''}">${sym(v)}</td>`).join('')}`+
         (x?`<td class="${cl(x.e3)}">${sg(x.e3)}${f(x.e3,1)}%</td><td class="${x.e6==null?'':cl(x.e6)}">${x.e6==null?'-':sg(x.e6)+f(x.e6,1)+'%'}</td>`:'<td>-</td><td>-</td>')+'</tr>'}).join('');
-    el.innerHTML=(M==='us'?FV:'')+`<h2 style="margin-top:4px">섹터 히트맵</h2><div class="sub2" id="pb">${PD.map(([n],i)=>`<button data-i="${i}">${n}</button>`).join('')}</div><div class="tg" id="tiles"></div>
+    el.innerHTML=(M==='us'?FV:FK)+`<h2 style="margin-top:4px">섹터 히트맵</h2><div class="sub2" id="pb">${PD.map(([n],i)=>`<button data-i="${i}">${n}</button>`).join('')}</div><div class="tg" id="tiles"></div>
       <h2>피델리티 국면별 섹터 패턴</h2><div style="margin-bottom:6px">현재 추정 국면: <b>${PH[top]} 국면</b></div>
       <table><tr><th>섹터</th>${PH.map((p,i)=>`<th style="text-align:center">${p}${i===top?'<br><span class="bd">섹터</span>':''}</th>`).join('')}<th>3개월 상대</th><th>6개월 상대</th></tr>${tbl}</table>
       <div class="note">++ / + : 해당 국면에서 시장보다 높은 수익률 확률이 매우 높음 / 높음, −− / − : 낮은 확률, 빈칸: 뚜렷한 상관 없음. 상대 수익률은 ${bm} 대비 %p입니다. '섹터' 배지는 최근 3개월 섹터 초과수익 패턴이 피델리티 표와 가장 닮은 국면(추정)이며 실제 경기 지표와 다를 수 있어요. 섹터 이름 옆 "!"를 누르면 섹터의 성격이 열립니다.</div>
@@ -197,6 +212,26 @@ async function flowView(el){
       const s=SI[t.dataset.n],r=document.createElement('tr');r.className='ir';
       r.innerHTML=`<td colspan="7" style="text-align:left;color:var(--mu);font-size:12px">${s[0]} · ${s[1]} — ${s[2]}</td>`;tr.after(r)};
   }catch(_){el.textContent='차트용 데이터가 없어요. Actions에서 update-data를 먼저 실행해 주세요.'}
+}
+
+const REPO='efiltsew-cmd/Stock-market-analysis';
+async function refresh(){
+  const b=$('#rf');let tk=localStorage.getItem('gh_tk');
+  if(!tk){tk=(prompt('GitHub 토큰을 입력하세요 (이 기기 브라우저에만 저장됩니다)')||'').trim();if(!tk)return;localStorage.setItem('gh_tk',tk)}
+  b.disabled=true;b.textContent='요청 중…';
+  try{
+    const r=await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/update.yml/dispatches`,{method:'POST',headers:{Authorization:'Bearer '+tk,Accept:'application/vnd.github+json'},body:JSON.stringify({ref:'main'})});
+    if(r.status!==204){if([401,403,404].includes(r.status))localStorage.removeItem('gh_tk');throw new Error(r.status)}
+    const old=D.updated;
+    for(let i=0;i<16;i++){
+      b.textContent=`갱신 중… (${i*15}초)`;
+      await new Promise(s=>setTimeout(s,15000));
+      const n=await fetch('data.json?'+Date.now()).then(r=>r.json()).catch(()=>null);
+      if(n&&n.updated!==old){D=n;Object.keys(HC).forEach(k=>delete HC[k]);$('#upd').textContent='마지막 갱신: '+new Date(D.updated).toLocaleString('ko-KR');go();b.textContent='✅ 갱신 완료';b.disabled=false;return}
+    }
+    b.textContent='진행 중 — 잠시 후 새로고침';
+  }catch(e){b.textContent='실패('+e.message+') 토큰 확인'}
+  b.disabled=false;
 }
 
 fetch('data.json?'+Date.now()).then(r=>r.json()).then(d=>{
